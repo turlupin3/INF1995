@@ -1,0 +1,71 @@
+Polytechnique Montréal
+
+Département de génie informatique et génie logiciel
+
+INF1995: Projet initial en ingénierie informatique
+         et travail en équipe
+
+Grille de correction des programmes:
+
+Identification:
+  Travail Pratique # : tp3
+  Section #  : 03
+  Équipe #   : 65
+  Correcteur : Samuel Ferron
+
+
+Lisibilité:(/5)
+  En-têtes en début de programme et de fonctions   (1 point) :
+  Identificateurs significatifs (variables, etc.)  (1 point) :
+  Commentaires aux endroits stratégiques           (1 point) :
+  Indentation et facilité de lecture               (1 point) :
+  Broches, ressources matérielles bien identifiées (1 point) :
+
+Modularité et comprehension: (/5)
+  Les fonctions sont assez courtes, bien
+        établies et avec de bons paramètres        (1 point) :
+  Le code reflète une bonne compréhension
+        des concepts de base                       (2 points):
+  Le code montre que la solution proposée
+        permet de bien résoudre le problème        (2 points):
+
+Fonctionnalité:(/10)
+  Soumission réussie sous GIT (bon endroit,
+        sans fichiers inutiles)                    (3 points):
+  Compilation sans "warnings" et sans erreurs      (2 point) : - 0.5
+    Warnings pour la déclaration de vous enums
+  Fonctionnement correct (évalué en "boite noire") (5 points):
+
+
+Total: 19.5
+
+
+Commentaires du correcteur: Bon code. En passant, pas besoin de
+faire 0b00000001, vous pouvez faire 0b1.
+
+
+
+
+======================= Présence de gitignore(s) ===============================
+
+Aucun gitignore trouvé :(
+
+====================== Fichiers Indésirables ===================================
+
+
+====================== Output de make pour les problemes =======================
+
+============== output make dans tp/tp3/pb1 ============================
+avr-gcc -I. -MMD  -g -mmcu=atmega324pa -Os -fpack-struct -fshort-enums -funsigned-bitfields -funsigned-char -Wall                                         -fno-exceptions      -c inf1995tp3l1.cpp
+inf1995tp3l1.cpp:31:3: warning: anonymous type with no linkage used to declare variable ‘<anonymous enum> state’ with linkage
+ } state; 
+   ^
+avr-gcc -Wl,-Map,tp3.out.map -mmcu=atmega324pa -o tp3.out  inf1995tp3l1.o \
+-lm 
+============== output make dans tp/tp3/pb2 ============================
+avr-gcc -I. -MMD  -g -mmcu=atmega324pa -Os -fpack-struct -fshort-enums -funsigned-bitfields -funsigned-char -Wall                                         -fno-exceptions      -c inf1995tp3l2.cpp
+inf1995tp3l2.cpp:34:3: warning: anonymous type with no linkage used to declare variable ‘<anonymous enum> state’ with linkage
+ } state; 
+   ^
+avr-gcc -Wl,-Map,tp3.out.map -mmcu=atmega324pa -o tp3.out  inf1995tp3l2.o \
+-lm 

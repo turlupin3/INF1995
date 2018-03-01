@@ -1,0 +1,6 @@
+Macro, effet comme constant, #define true 1
+lors de la compilation, le compilateur va remplacer tous les true dans le code par 1, et va alors compiler le code;
+
+EIMSK, INT0, EICRA, sont des macros
+
+EIMSK |= (1 << INT0); //est egale a : EIMSK = EIMSK | 0b00000001; car dans EIMSK, il existe des bits dont on a pas acces, mais quon doit tenir en compte leur valeur, on peut pas faire EIMMSK = 0b00000001, car on ne tien pas en compte leur valeur
