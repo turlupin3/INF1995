@@ -23,19 +23,19 @@ MCU=atmega324pa
 
 # Nom de votre projet
 # (utilisez un seul mot, exemple: 'monprojet')
-PROJECTNAME=pb1
+PROJECTNAME=test
 
 # Fichiers sources
 # Utilisez le suffixe .cpp pour les fichiers C++
 # Listez tous les fichiers a compiler, separes par
 # un espace. exemple: 'tp1.c tp2.cpp':
-PRJSRC=pb1.cpp
+PRJSRC=test.cpp
 
 # Inclusions additionnels (ex: -I/path/to/mydir)
-INC=
+INC= -I/./library/
 
 # Libraires a lier (ex: -lmylib)
-LIBS=
+LIBS= library/library.a
 
 # Niveau d'optimization
 # Utilisez s (size opt), 1, 2, 3 ou 0 (off)
