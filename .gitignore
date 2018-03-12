@@ -4,3 +4,5 @@
 *.map
 *.exe
 *.hex
+*.a
+*.out.map
