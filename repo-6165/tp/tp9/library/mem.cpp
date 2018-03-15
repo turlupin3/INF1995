@@ -19,7 +19,7 @@ uint8_t* lecture() {
 	return donneesSortie;
 }
 
-void ecrireDonnees(unsigned char * donneesEntrees,uint8_t longueur) {
+void ecriture(char donneesEntrees,uint8_t longueur) {
 
 	
 	Memoire24CXXX memoire = Memoire24CXXX();

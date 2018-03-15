@@ -10,9 +10,10 @@ void initialisationUART ( ) {
 
 	UBRR0L = 0xCF;
 
-	// permettre la reception et la transmission par le UART0
+	// permettre la reception et la reception par le UART0
 
-	UCSR0A |= (1 << TXC0);
+	//UCSR0A |= (1 << TXC0);
+	UCSR0A |= (1 << RXC0);
 
 	UCSR0B |= (1 << TXEN0);
 	UCSR0B |= (1 << RXEN0);
@@ -30,4 +31,12 @@ void transmissionUART ( uint8_t donnee ) {
 	
 	/* Put data into buffer, sends the data */
 	UDR0 = donnee;
+}
+
+unsigned char receptionUART (){
+	
+	while(!(UCSR0A & (1<<RXC0))){
+		//wait for data
+	}
+	return UDR0;
 }
