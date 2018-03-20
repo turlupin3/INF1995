@@ -1,4 +1,6 @@
+#define F_CPU 8000000
+
 #include <avr/interrupt.h>
 
 
-void ajustementPWM(uint16_t valeur);
+void setupPWMNote();
