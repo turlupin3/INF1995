@@ -10,3 +10,4 @@ const uint32_t OFF = 0b00000000;
 const uint32_t PORT_SORTIE  = 0xff;
 
 void demarrage();
+void test();
