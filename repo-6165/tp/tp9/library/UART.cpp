@@ -10,7 +10,7 @@ void initialisationUART ( ) {
 
 	UBRR0L = 0xCF;
 
-	// permettre la reception et la reception par le UART0
+	// permettre la reception et la transmission par le UART0
 
 	//UCSR0A |= (1 << TXC0);
 	UCSR0A |= (1 << RXC0);

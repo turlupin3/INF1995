@@ -24,4 +24,7 @@ void demarrage(){
 
 void test(){
 	PORTB = ROUGE;
+	_delay_ms(500);
+	PORTB = OFF;
+	_delay_ms(500);
 }
