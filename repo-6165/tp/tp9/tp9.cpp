@@ -110,51 +110,54 @@ int main(){
 	
 	
 	demarrage();
+
 	
 	Memoire24CXXX memoire = Memoire24CXXX();
-	//~ memoire.init(); pas neccessaire
 	
 	initialisationUART();
 	
-	uint8_t longueur = 0;
-	unsigned char tab[20];
+	uint16_t tailleByteCode = 0;
 	
-	//~ while(UCSR0A & (1<<TXC0)){
-	//~ demarrage();
-		//~ memoire.ecriture(++longueur, receptionUART());
-	//~ }
+	uint8_t octet1= receptionUART();
+	//~ test();
 	
-	for(int i = 0; i < 20; i++){
-		demarrage();
-		tab[i]=receptionUART();
-		longueur++;
-		
+	uint8_t octet2= receptionUART();
+	//~ test();
+	
+	tailleByteCode = (octet1 << 8) + (octet2);
+	
+	memoire.ecriture(0, octet1);
+	memoire.ecriture(1, octet2);
+	
+	for(uint16_t i = 2; i < tailleByteCode; i++){
+		memoire.ecriture(i, receptionUART());
+		//~ test();
 	}
+	PORTB= 2;
 	
-	unsigned char byteCode[longueur+1];
+	_delay_ms(15000);
+
+	unsigned char byteCode[tailleByteCode];
 	
-	for(uint16_t i = 0; i < longueur; i++){
-		
-		memoire.lecture(i, byteCode, longueur);
-	}
+	memoire.lecture(0, byteCode, tailleByteCode);
 	
-	operation operations[longueur];
 	
-	for(uint16_t i = 2; i < longueur; i+=2){
+	operation operations[tailleByteCode];
+	
+	for(uint16_t i = 2; i < tailleByteCode; i+=2){
 	
 		operations[i-2].instruction = byteCode[i];
 		operations[i-2].operande = byteCode[i+1];
 	}
 	
 	uint16_t instructionCounter = 0;
-	for(int i = 0; i < longueur; i++){
+	for(uint16_t i = 0; i < tailleByteCode; i++){
 		
 		if((operations[i].instruction == 0x01 || debut) && !varFin ) {
 		
 			switch(operations[i].instruction){
 		
 			case 0x01: debut = true;
-			test();
 					break;
 		
 			case 0x02: att(operations[i].operande);
