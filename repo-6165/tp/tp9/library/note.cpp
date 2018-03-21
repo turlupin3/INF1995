@@ -1,6 +1,7 @@
 #include <note.h>
 
 void setupPWMNote(){
+	DDRD = 0xff;
 	TCNT1 = 0x0;
 	
 	TCCR1A |= (1 << WGM10);	//mode PWM top ocr1a
@@ -12,8 +13,8 @@ void setupPWMNote(){
 	TCCR1B &= ~(1 << CS11);
 	TCCR1B &= ~(1 << CS12);
 	
-	//~ TCCR1A |= (1 << COM1A1); //mode de compare
-	//~ TCCR1A |= (1 << COM1A0);
+	TCCR1A &= ~(1 << COM1A1); //mode de compare
+	TCCR1A &= ~(1 << COM1A0);
 	TCCR1A |= (1 << COM1B1);
 	TCCR1A &= ~(1 << COM1B0);
 	

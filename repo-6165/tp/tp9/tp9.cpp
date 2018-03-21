@@ -123,7 +123,10 @@ int main(){
 	
 	
 	demarrage();
-	jouerNote(60);
+	jouerNote(70);
+	_delay_ms(1000);
+	jouerNote(65);
+	while(true){}
 	
 	Memoire24CXXX memoire = Memoire24CXXX();
 	
