@@ -1,6 +1,5 @@
 dbt ;# début de l'exécution
 att 200 ;# attendre 4s
-dal 127 ;# DEL 1, 2, 3, 4, 5, 6 et 7 sont allumées
-det 64 ;// éteindre la DEL 7. Les autres restent allumées
-det 1 ;% éteindre la DEL 1. Les DEL 2, 3, 4, 5 et 6 allumées
+det 1;
+sgo 69; //note
 fin ; // fin de l'execution

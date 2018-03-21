@@ -4,6 +4,7 @@
 #include <./library/memoire_24.h>
 #include <./library/UART.h>
 #include <./library/pwmoteur.h>
+#include <./library/note.h>
 
 bool debut = false;
 bool varFin = false;
@@ -29,29 +30,31 @@ void att(unsigned char op){
 void dal(unsigned char op){
 	if (op != 0) {
 		//allumer del
-		DDRB=0xff;
-		PORTB = 0x01;
+		DDRA=0xff;
+		PORTA = 0x01;
 	}
-	//not neccesary
+	//not necessary
 	if (op == 2) {
-		DDRB=0xff;
-		PORTB |= 0b0100;
+		DDRA=0xff;
+		PORTA |= 0b0100;
 	}
 }
 
 void det(unsigned char op) {
 	if (op != 0) {
 	//eteindre les DEL
-	PORTB = 0x00;
+	PORTA = 0x00;
 	}
 }
 
-void sgo(unsigned char op) {
-	// jouer une sonorite
-}
+//~ void sgo(unsigned char op) {
+	//~ // jouer une sonorite (D/J'A FAIT)
+	//~ jouerNote(op);
+//~ }
 
 void sar(unsigned char op) {
 	//arreter de jouer la sonorite
+	
 }
 
 void mar(unsigned char op) {
@@ -77,19 +80,20 @@ void mre(unsigned char op) {
 	PORTB |= 0b0;
 	
 }
-void trd(unsigned char op) {
+void trd() {
 	//tourner a droite
 	DDRB = 0xff;
 	setUpPWMoteur();
-	OCR0B = 128;
+	OCR0B = 128; // VOIR PENDANT COMBIEN DE TEMPS + AUTRE ROUE
+
 	arreterMoteur();
 	
 }
-void trg(unsigned char op) {
+void trg() {
 	//tourner a gauche
 	DDRB = 0xff;
 	setUpPWMoteur();
-	OCR0A = 128;
+	OCR0A = 128; // VOIR PENDANT COMBIEN DE TEMPS + AUTRE ROUE
 	arreterMoteur();
 }
 uint16_t dbc(unsigned char op, uint16_t instructionCounter) {
@@ -97,13 +101,13 @@ uint16_t dbc(unsigned char op, uint16_t instructionCounter) {
 	counter = op;
 	return instructionCounter;
 }
-uint16_t fbc(unsigned char op, uint16_t instructionCounter, uint16_t currentInstruction) {
+uint16_t fbc(unsigned char op, uint16_t & instructionCounter, uint16_t currentInstruction) {
 	//fin de boucle
 	if (counter > 0) { //maybe use counter+1
 		counter--;
 		return ++instructionCounter; //maybe no ++
 	}
-	return 0;
+	return currentInstruction;
 }
 void fin(unsigned char op) {
 	//fin
@@ -140,11 +144,9 @@ int main(){
 	
 	for(uint16_t i = 2; i < tailleByteCode; i++){
 		memoire.ecriture(i, receptionUART());
-		//~ test();
 	}
-	PORTB= 2;
 	
-	_delay_ms(15000);
+	_delay_ms(1000);
 
 	unsigned char byteCode[tailleByteCode];
 	
@@ -158,7 +160,8 @@ int main(){
 		operations[i-2].instruction = byteCode[i];
 		operations[i-2].operande = byteCode[i+1];
 	}
-	
+	DDRA = 0xff;
+	PORTA = 2;
 	uint16_t instructionCounter = 0;
 	for(uint16_t i = 0; i < tailleByteCode; i++){
 		
@@ -184,7 +187,10 @@ int main(){
 			case 0xC1 :
 						i =	fbc(operations[i].operande, instructionCounter, i);
 						break;
+			case 0x48 : jouerNote(operations[i].operande);
+						break;
 			}
+			
 		
 		}
 		
