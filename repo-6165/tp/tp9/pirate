@@ -1,0 +1,18 @@
+dbt ; # started, other command are: sgo xx : sar : att x25
+sgo 57 ;
+att 5 ; 
+sgo 60 ;
+att 5;
+sgo 62 ;
+att 10;
+sgo 62 ;
+att 10;
+sgo 62 ;
+att 5;
+sgo 64 ;
+att 5;
+sgo 65 ;
+att 10;
+sgo 65 ;
+att 10;
+fin ; # ended
