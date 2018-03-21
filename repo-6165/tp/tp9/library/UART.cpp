@@ -37,7 +37,7 @@ unsigned char receptionUART (){
 	
 	while(!(UCSR0A & (1<<RXC0))){
 		//wait for data
-		DDRB=0xff;
+		DDRA=0xff;
 		PORTA = 1;
 	}
 	return UDR0;

@@ -125,8 +125,6 @@ int main(){
 	
 	demarrage();
 	
-	while(true){}
-	
 	Memoire24CXXX memoire = Memoire24CXXX();
 	
 	initialisationUART();

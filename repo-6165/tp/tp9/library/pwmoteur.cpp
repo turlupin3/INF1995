@@ -36,7 +36,7 @@ void avancerMoteur(unsigned char op) {
 	setUpPWMoteur();
 	OCR0B = op;
 	OCR0A = op;
-	PORTB |= 0b100100;
+	//PORTB |= 0b100100;
 	
 }
 void reculerMoteur(unsigned char op) {

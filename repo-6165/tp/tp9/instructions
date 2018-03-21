@@ -1,5 +1,11 @@
 dbt ;# début de l'exécution
-att 200 ;# attendre 4s
+dal 1;
+mav 255;
+att 255;
 det 1;
-sgo 69; //note
+att 100;
+dal 1;
+att 100;
+mar;
+det 1;
 fin ; // fin de l'execution
