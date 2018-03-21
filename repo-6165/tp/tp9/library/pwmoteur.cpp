@@ -39,7 +39,7 @@ void avancerMoteur(unsigned char op) {
 	PORTB |= 0b100100;
 	
 }
-void reculer(unsigned char op) {
+void reculerMoteur(unsigned char op) {
 	//reculer
 	DDRB = 0xff;
 	setUpPWMoteur();

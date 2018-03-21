@@ -190,8 +190,22 @@ int main(){
 						break;
 			case 0x48 : jouerNote(operations[i].operande);
 						break;
+			case 0x60 :
+					arreterMoteur();
+					break;
+			case 0x62 :
+					avancerMoteur(operations[i].operande);
+					break;
+			case 0x63 :
+					reculerMoteur(operations[i].operande);
+					break;
+			case 0x64 :
+					tournerDroite();
+					break;
+			case 0x65 :
+					tournerGauche();
+					break;
 			}
-			
 		
 		}
 		

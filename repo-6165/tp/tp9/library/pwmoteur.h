@@ -7,6 +7,6 @@
 void setUpPWMoteur();
 void arreterMoteur();
 void avancerMoteur(unsigned char op);
-void reculer(unsigned char op);
+void reculerMoteur(unsigned char op);
 void tournerDroite();
 void tournerGauche();
