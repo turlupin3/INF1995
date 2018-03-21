@@ -17,8 +17,8 @@ void setupPWMNote(){
 	TCCR1A |= (1 << COM1B1);
 	TCCR1A &= ~(1 << COM1B0);
 	
-	OCR1B = 0;
-	OCR1A = 0;
+	OCR1B = 40000;
+	OCR1A = 20000;
 	
 	//~ TIMSK1 |= (1<< OCIE1A);
 	TIMSK1 |= (1<< OCIE1B);
@@ -131,13 +131,13 @@ void jouerNote(uint8_t note){
 			OCR1A = calculOCR1A(659.2551138);
 			break;
 		case 77:
-			OCR1A = calculOCR1A(698.4564629);;
+			OCR1A = calculOCR1A(698.4564629);
 			break;
 		case 78:
 			OCR1A = calculOCR1A(739.9888454);
 			break;
 		case 79:
-			OCR1A = calculOCR1A(783.990872);;
+			OCR1A = calculOCR1A(783.990872);
 			break;
 		case 80:
 			OCR1A = calculOCR1A(830.6093952);
@@ -145,8 +145,6 @@ void jouerNote(uint8_t note){
 		case 81:
 			OCR1A = calculOCR1A(880);
 			break;
-		default:
-			PORTA = 0x01;
 				
 	}
 	OCR1B = OCR1A/2;
