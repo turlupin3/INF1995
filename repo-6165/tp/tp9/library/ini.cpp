@@ -8,18 +8,11 @@ void demarrage(){
 	_delay_ms(500);
 	PORTA = OFF;
 	_delay_ms(250);
-	PORTA = ROUGE;
-	_delay_ms(500);
-	PORTA = OFF;
-	_delay_ms(250);
 	
 	PORTA = VERT;
 	_delay_ms(500);
 	PORTA = OFF;
 	_delay_ms(250);
-		PORTA = VERT;
-	_delay_ms(500);
-	PORTA = OFF;
 }
 
 void test(){

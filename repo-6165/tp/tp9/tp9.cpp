@@ -123,7 +123,7 @@ int main(){
 	
 	
 	demarrage();
-
+	jouerNote(69);
 	
 	Memoire24CXXX memoire = Memoire24CXXX();
 	
@@ -160,8 +160,7 @@ int main(){
 		operations[i-2].instruction = byteCode[i];
 		operations[i-2].operande = byteCode[i+1];
 	}
-	DDRA = 0xff;
-	PORTA = 2;
+
 	uint16_t instructionCounter = 0;
 	for(uint16_t i = 0; i < tailleByteCode; i++){
 		
