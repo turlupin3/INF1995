@@ -65,7 +65,7 @@ void mav(unsigned char op) {
 	setUpPWMoteur();
 	OCR0B = op;
 	OCR0A = op;
-	PORTB = 0b10010;
+	PORTB |= 0b10010;
 	
 }
 void mre(unsigned char op) {
@@ -74,14 +74,23 @@ void mre(unsigned char op) {
 	setUpPWMoteur();
 	OCR0B = op;
 	OCR0A = op;
-	PORTB = 0b00000;
+	PORTB |= 0b0;
 	
 }
 void trd(unsigned char op) {
 	//tourner a droite
+	DDRB = 0xff;
+	setUpPWMoteur();
+	OCR0B = 128;
+	arreterMoteur();
+	
 }
 void trg(unsigned char op) {
-	//tourner a auche
+	//tourner a gauche
+	DDRB = 0xff;
+	setUpPWMoteur();
+	OCR0A = 128;
+	arreterMoteur();
 }
 uint16_t dbc(unsigned char op, uint16_t instructionCounter) {
 	//debut de boucle
