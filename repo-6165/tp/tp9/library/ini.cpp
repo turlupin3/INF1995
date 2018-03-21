@@ -2,32 +2,32 @@
 
 void demarrage(){
 	
-	DDRB = PORT_SORTIE; // PORT B est en mode sortie
+	DDRA = 0xff; // PORT A est en mode sortie
 	
-	PORTB = ROUGE;
+	PORTA = ROUGE;
 	_delay_ms(500);
-	PORTB = OFF;
+	PORTA = OFF;
 	_delay_ms(250);
-	PORTB = ROUGE;
+	PORTA = ROUGE;
 	_delay_ms(500);
-	PORTB = OFF;
+	PORTA = OFF;
 	_delay_ms(250);
 	
-	PORTB = VERT;
+	PORTA = VERT;
 	_delay_ms(500);
-	PORTB = OFF;
+	PORTA = OFF;
 	_delay_ms(250);
-		PORTB = VERT;
+		PORTA = VERT;
 	_delay_ms(500);
-	PORTB = OFF;
+	PORTA = OFF;
 }
 
 void test(){
-	DDRB=PORT_SORTIE;
+	DDRA=PORT_SORTIE;
 	
-	PORTB = VERT;
+	PORTA = VERT;
 	_delay_ms(500);
-	PORTB = OFF;
+	PORTA = OFF;
 	_delay_ms(500);
 }
 

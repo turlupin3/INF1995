@@ -132,10 +132,10 @@ int main(){
 	uint16_t tailleByteCode = 0;
 	
 	uint8_t octet1= receptionUART();
-	//~ test();
+
 	
 	uint8_t octet2= receptionUART();
-	//~ test();
+
 	
 	tailleByteCode = (octet1 << 8) + (octet2);
 	
