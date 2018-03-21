@@ -13,12 +13,12 @@ void setupPWMNote(){
 	TCCR1B &= ~(1 << CS12);
 	
 	//~ TCCR1A |= (1 << COM1A1); //mode de compare
-	//~ TCCR1A &= ~(1 << COM1A0);
+	//~ TCCR1A |= (1 << COM1A0);
 	TCCR1A |= (1 << COM1B1);
 	TCCR1A &= ~(1 << COM1B0);
 	
-	OCR1B = 40000;
-	OCR1A = 20000;
+	OCR1B = 0;
+	OCR1A = 0;
 	
 	//~ TIMSK1 |= (1<< OCIE1A);
 	TIMSK1 |= (1<< OCIE1B);

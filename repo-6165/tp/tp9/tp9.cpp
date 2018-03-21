@@ -123,7 +123,7 @@ int main(){
 	
 	
 	demarrage();
-	setupPWMNote();
+	jouerNote(60);
 	
 	Memoire24CXXX memoire = Memoire24CXXX();
 	

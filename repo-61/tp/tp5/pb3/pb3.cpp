@@ -48,7 +48,7 @@ int main()
 	DDRD = 0xff;
 	PORTD = 0;
 	
-	ajustementPWM(50);
+	ajustementPWM(200);
 	
 	while(true)
 	{}
