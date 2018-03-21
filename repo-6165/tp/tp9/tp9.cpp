@@ -31,12 +31,12 @@ void dal(unsigned char op){
 	if (op != 0) {
 		//allumer del
 		DDRA=0xff;
-		PORTA = 0x01;
+		PORTA = 2;
 	}
 	//not necessary
 	if (op == 2) {
 		DDRA=0xff;
-		PORTA |= 0b0100;
+		PORTA = 2;
 	}
 }
 
