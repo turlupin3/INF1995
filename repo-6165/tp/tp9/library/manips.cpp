@@ -10,18 +10,18 @@ void fin(bool & boolFin) {
 	boolFin = false;
 }
 
-uint32_t counter;
 
-uint16_t dbc(unsigned char op, uint16_t instructionCounter) {
+
+uint16_t dbc(unsigned char op, uint16_t instructionCounter,uint16_t & counter) {
 	//debut de boucle
 	counter = op;
 	return instructionCounter;
 }
-uint16_t fbc(unsigned char op, uint16_t & instructionCounter, uint16_t currentInstruction) {
+uint16_t fbc(unsigned char op, uint16_t instructionCounter, uint16_t currentInstruction,uint16_t & counter) {
 	//fin de boucle
 	if (counter > 0) { //maybe use counter+1
 		counter--;
-		return ++instructionCounter; //maybe no ++
+		return instructionCounter +1; //maybe no ++
 	}
 	return currentInstruction;
 }

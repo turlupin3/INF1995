@@ -160,7 +160,7 @@ int main(){
 		operations[i-2].instruction = byteCode[i];
 		operations[i-2].operande = byteCode[i+1];
 	}
-
+	uint16_t counter = 0;
 	uint16_t instructionCounter = 0;
 	for(uint16_t i = 0; i < tailleByteCode; i++){
 		
@@ -181,10 +181,10 @@ int main(){
 			case 0xFF : fin(varFin);
 						break;
 			case 0xC0 :
-						instructionCounter = dbc(operations[i].operande, i);
+						instructionCounter = dbc(operations[i].operande, i,counter);
 						break;
 			case 0xC1 :
-						i =	fbc(operations[i].operande, instructionCounter, i);
+						i =	fbc(operations[i].operande, instructionCounter, i,counter);
 						break;
 			case 0x48 : jouerNote(operations[i].operande);
 						break;
