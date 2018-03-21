@@ -5,10 +5,11 @@
 #include <./library/UART.h>
 #include <./library/pwmoteur.h>
 #include <./library/note.h>
+#include <./library/manips.h>
 
-bool debut = false;
-bool varFin = false;
-uint32_t counter;
+bool varDebut;
+bool varFin;
+//~ uint32_t counter;
 
 struct operation{
 	unsigned char instruction; 
@@ -21,98 +22,98 @@ void delay_ms(double ms){
 	}
 }
 
-void att(unsigned char op){
+//~ void att(unsigned char op){
 	
 
-	delay_ms(25*op);
-}
+	//~ delay_ms(25*op);
+//~ }
 
-void dal(unsigned char op){
-	if (op != 0) {
-		//allumer del
-		DDRA=0xff;
-		PORTA = 2;
-	}
-	//not necessary
-	if (op == 2) {
-		DDRA=0xff;
-		PORTA = 2;
-	}
-}
+//~ void dal(unsigned char op){
+	//~ if (op != 0) {
+		//~ //allumer del
+		//~ DDRA=0xff;
+		//~ PORTA = 2;
+	//~ }
+	//~ //not necessary
+	//~ if (op == 2) {
+		//~ DDRA=0xff;
+		//~ PORTA = 2;
+	//~ }
+//~ }
 
-void det(unsigned char op) {
-	if (op != 0) {
-	//eteindre les DEL
-	PORTA = 0x00;
-	}
-}
+//~ void det(unsigned char op) {
+	//~ if (op != 0) {
+	//~ //eteindre les DEL
+	//~ PORTA = 0x00;
+	//~ }
+//~ }
 
 //~ void sgo(unsigned char op) {
 	//~ // jouer une sonorite (D/J'A FAIT)
 	//~ jouerNote(op);
 //~ }
 
-void sar(unsigned char op) {
-	//arreter de jouer la sonorite
+//~ void sar(unsigned char op) {
+	//~ //arreter de jouer la sonorite
 	
-}
+//~ }
 
-void mar(unsigned char op) {
-	//arreter les moteurs
-	arreterMoteur();
-}
+//~ void mar(unsigned char op) {
+	//~ //arreter les moteurs
+	//~ arreterMoteur();
+//~ }
 
-void mav(unsigned char op) {
-	//avancer
-	DDRB = 0xff;
-	setUpPWMoteur();
-	OCR0B = op;
-	OCR0A = op;
-	PORTB |= 0b10010;
+//~ void mav(unsigned char op) {
+	//~ //avancer
+	//~ DDRB = 0xff;
+	//~ setUpPWMoteur();
+	//~ OCR0B = op;
+	//~ OCR0A = op;
+	//~ PORTB |= 0b10010;
 	
-}
-void mre(unsigned char op) {
-	//reculer
-	DDRB = 0xff;
-	setUpPWMoteur();
-	OCR0B = op;
-	OCR0A = op;
-	PORTB |= 0b0;
+//~ }
+//~ void mre(unsigned char op) {
+	//~ //reculer
+	//~ DDRB = 0xff;
+	//~ setUpPWMoteur();
+	//~ OCR0B = op;
+	//~ OCR0A = op;
+	//~ PORTB |= 0b0;
 	
-}
-void trd() {
-	//tourner a droite
-	DDRB = 0xff;
-	setUpPWMoteur();
-	OCR0B = 128; // VOIR PENDANT COMBIEN DE TEMPS + AUTRE ROUE
+//~ }
+//~ void trd() {
+	//~ //tourner a droite
+	//~ DDRB = 0xff;
+	//~ setUpPWMoteur();
+	//~ OCR0B = 128; // VOIR PENDANT COMBIEN DE TEMPS + AUTRE ROUE
 
-	arreterMoteur();
+	//~ arreterMoteur();
 	
-}
-void trg() {
-	//tourner a gauche
-	DDRB = 0xff;
-	setUpPWMoteur();
-	OCR0A = 128; // VOIR PENDANT COMBIEN DE TEMPS + AUTRE ROUE
-	arreterMoteur();
-}
-uint16_t dbc(unsigned char op, uint16_t instructionCounter) {
-	//debut de boucle
-	counter = op;
-	return instructionCounter;
-}
-uint16_t fbc(unsigned char op, uint16_t & instructionCounter, uint16_t currentInstruction) {
-	//fin de boucle
-	if (counter > 0) { //maybe use counter+1
-		counter--;
-		return ++instructionCounter; //maybe no ++
-	}
-	return currentInstruction;
-}
-void fin(unsigned char op) {
-	//fin
-	varFin = false;
-}
+//~ }
+//~ void trg() {
+	//~ //tourner a gauche
+	//~ DDRB = 0xff;
+	//~ setUpPWMoteur();
+	//~ OCR0A = 128; // VOIR PENDANT COMBIEN DE TEMPS + AUTRE ROUE
+	//~ arreterMoteur();
+//~ }
+//~ uint16_t dbc(unsigned char op, uint16_t instructionCounter) {
+	//~ //debut de boucle
+	//~ counter = op;
+	//~ return instructionCounter;
+//~ }
+//~ uint16_t fbc(unsigned char op, uint16_t & instructionCounter, uint16_t currentInstruction) {
+	//~ //fin de boucle
+	//~ if (counter > 0) { //maybe use counter+1
+		//~ counter--;
+		//~ return ++instructionCounter; //maybe no ++
+	//~ }
+	//~ return currentInstruction;
+//~ }
+//~ void fin(unsigned char op) {
+	//~ //fin
+	//~ varFin = false;
+//~ }
 
 
 
@@ -123,9 +124,7 @@ int main(){
 	
 	
 	demarrage();
-	jouerNote(70);
-	_delay_ms(1000);
-	jouerNote(65);
+	
 	while(true){}
 	
 	Memoire24CXXX memoire = Memoire24CXXX();
@@ -167,21 +166,21 @@ int main(){
 	uint16_t instructionCounter = 0;
 	for(uint16_t i = 0; i < tailleByteCode; i++){
 		
-		if((operations[i].instruction == 0x01 || debut) && !varFin ) {
+		if((operations[i].instruction == 0x01 || varDebut) && !varFin ) {
 		
 			switch(operations[i].instruction){
 		
-			case 0x01: debut = true;
-					break;
+			case 0x01: 	debut(varDebut);
+						break;
 		
-			case 0x02: att(operations[i].operande);
-					break;
+			case 0x02: 	att(operations[i].operande);
+						break;
 			
 			case  0x44: dal(operations[i].operande);
 						break;
 			case  0x45: det(operations[i].operande);
 						break;
-			case 0xFF : fin(operations[i].operande);
+			case 0xFF : fin(varFin);
 						break;
 			case 0xC0 :
 						instructionCounter = dbc(operations[i].operande, i);
