@@ -1,12 +1,12 @@
 dbt ; # started, other command are: sgo xx : sar : att x25
 sgo 57 ;
-att 5 ; 
+att 15 ; 
 sgo 60 ;
-att 5;
+att 15;
 sgo 62 ;
-att 10;
+att 30;
 sgo 62 ;
-att 10;
+att 30;
 sgo 62 ;
 att 5;
 sgo 64 ;
