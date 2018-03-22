@@ -124,6 +124,7 @@ int main(){
 	
 	
 	demarrage();
+
 	
 	Memoire24CXXX memoire = Memoire24CXXX();
 	
@@ -191,6 +192,9 @@ int main(){
 			case 0x09 : arreterJouer();
 						break;
 			case 0x60 :
+					arreterMoteur();
+					break;
+			case 0x61 :
 					arreterMoteur();
 					break;
 			case 0x62 :

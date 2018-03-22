@@ -33,6 +33,8 @@ void arreterJouer(){
 	TCCR1B &= ~(1 << CS10); //set prescaler to 0 / stop counting
 	TCCR1B &= ~(1 << CS11);
 	TCCR1B &= ~(1 << CS12);
+	OCR1B = 0;
+	OCR1A = 0;
 }
 
 void jouerNote(uint8_t note){

@@ -1,42 +1,48 @@
 #include <pwmoteur.h>
 
 void setUpPWMoteur(){
+	DDRB = 0xff;
 	TCNT0 = 0x0;
 	
 	TCCR0A |= (1 << WGM00);	//mode PWM, Phase corerct
-	TCCR0A |= (0 << WGM01);
+	TCCR0A &= ~(1 << WGM01);
 	TCCR0B |= (1 << WGM02);
 
-	TCCR0B |= (0 << CS10); //set prescaler to 8
+	TCCR0B &= ~(1 << CS10); //set prescaler to 8
 	TCCR0B |= (1 << CS11);
-	TCCR0B |= (0 << CS12);
+	TCCR0B &= ~(1 << CS12);
 	
-	TCCR0A |= (1 << COM0A1); //mode de compare
-	TCCR0A |= (1 << COM0B1);
-
+	TCCR1A |= (1 << COM1A1); //mode de compare
+	TCCR1A &= ~(1 << COM1A0);
+	TCCR1A |= (1 << COM1B1);
+	TCCR1A &= ~(1 << COM1B0);
+	
 
 	
 	OCR0B = 0;
 	OCR0A = 0;
 	
-	TIMSK0 |= (0<< OCR1A);
-	TIMSK0 |= (0<< OCR1B);
+	TIMSK0 |= (1 << OCR1A);
+	TIMSK0 |= (1 << OCR1B);
 
 }
 
 void arreterMoteur(){
-	TCCR0B |= (0 << CS10); //set prescaler to 0
-	TCCR0B |= (0 << CS11);
-	TCCR0B |= (0 << CS12);
+	DDRB = 0xff;
+	PORTB = 0x00;
+	TCCR0B &= ~(1 << CS00); //set prescaler to 0
+	TCCR0B &= ~(1 << CS01);
+	TCCR0B &= ~(1 << CS02);
+	OCR0B = 0;
+	OCR0A = 0;
 }
 
 void avancerMoteur(unsigned char op) {
 	//avancer
-	DDRB = 0xff;
 	setUpPWMoteur();
-	OCR0B = op;
-	OCR0A = op;
-	//PORTB |= 0b100100;
+	OCR0B = 50;
+	OCR0A = 50;
+	//~ PORTB |= 0b100100;
 	
 }
 void reculerMoteur(unsigned char op) {
@@ -45,7 +51,7 @@ void reculerMoteur(unsigned char op) {
 	setUpPWMoteur();
 	OCR0B = op;
 	OCR0A = op;
-	PORTB &= 0b011011;
+	//~ PORTB &= 0b011011;
 	
 }
 void tournerDroite() {
