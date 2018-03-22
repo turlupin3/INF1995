@@ -126,18 +126,6 @@ int main(){
 	//PORTB = 0b101000;
 	//_delay_ms(5000);
 	demarrage();
-	
-	avancerMoteur(255);
-	_delay_ms(1000);
-	arreterMoteur();
-	_delay_ms(1000);
-	reculerMoteur(255);
-	_delay_ms(1000);
-	tournerDroite();
-	_delay_ms(1000);
-	tournerGauche();
-	
-	_delay_ms(1000);
 
 	while(true){
 	}

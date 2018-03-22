@@ -109,7 +109,7 @@ void tournerDroite() {
 	OCR0B = 150; 
 	OCR0A = 150;
 	PORTB = 0b100000;
-	_delay_ms(1500); // VOIR PENDANT COMBIEN DE TEMPS + AUTRE ROUE
+	_delay_ms(1250); // VOIR PENDANT COMBIEN DE TEMPS + AUTRE ROUE
 	arreterMoteur();
 }
 void tournerGauche() {
@@ -119,7 +119,7 @@ void tournerGauche() {
 	OCR0B = 150; 
 	OCR0A = 150;
 	PORTB = 0b100;
-	_delay_ms(1500); // VOIR PENDANT COMBIEN DE TEMPS + AUTRE ROUE
+	_delay_ms(1250); // VOIR PENDANT COMBIEN DE TEMPS + AUTRE ROUE
 	arreterMoteur();
 	
 }
