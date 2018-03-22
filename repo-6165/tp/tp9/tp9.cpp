@@ -149,6 +149,12 @@ int main(){
 		memoire.ecriture(i, receptionUART());
 	}
 	
+	//~ uint8_t octet1= 0;
+	//~ uint8_t octet2= 0;
+	
+	//~ memoire.lecture(0, &octet1);
+	//~ memoire.lecture(1, &octet2);
+	//~ uint16_t tailleByteCode = (octet1 << 8) + (octet2);
 
 	unsigned char byteCode[tailleByteCode];
 	

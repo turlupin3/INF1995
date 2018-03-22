@@ -1,9 +1,11 @@
 dbt ;# début de l'exécution
+dbc 4;
 dal 1;
 sgo 65;
 att 50;
 sar;
 det 1;
+fbc;
 att 50;
 mav 255;
 att 50;
