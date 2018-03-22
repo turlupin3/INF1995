@@ -1,26 +1,129 @@
 dbt ; # started, other command are: sgo xx : sar : att x25
-sgo 57 ;
-att 5 ; 
+
+dbc 1;
+
+sgo 57 ;#la
+att 5 ; #croche
 sar;
-sgo 60 ;
-att 5;
+sgo 60 ;#do
+att 5; #croche
 sar;
-sgo 62 ;
+sgo 62 ;#re
+att 10; #noir
+sar;
+sgo 62 ;#re
+att 10; #noir
+sar;
+sgo 62 ;#re
+att 5; #croche
+sar;
+sgo 64 ;#mi
+att 5; #croche
+sar;
+sgo 65 ;#fa
+att 10; #noir
+sar;
+sgo 65 ;#fa
+att 10; #noir
+sar;  
+sgo 65 ;#fa
+att 5; #croche
+sar;
+sgo 67 ;#sol
+att 5; #croche
+sar; #l2m1
+
+sgo 64 ; #mi
+att 10; #noir
+sar;
+sgo 64 ; #mi
+att 10; #noir
+sar;
+sgo 62 ; #re
+att 5; #croche
+sar;
+sgo 60 ; #do
+att 5; #croche
+sar;
+sgo 60 ; #do
+att 5; #croche
+sar;
+sgo 62 ; #re
+att 10; #croche
+sar;
+att 5; #croche S
+
+fbc;
+
+sgo 57 ;#la
+att 5 ; #croche
+sar;
+sgo 60 ;#do
+att 5; #croche
+sar;
+sgo 62 ;#re
+att 10; #noir
+sar;
+sgo 62 ;#re
+att 10; #noir
+sar;
+sgo 62 ;#re
+att 5; #croche
+sar;
+sgo 65 ;#fa
+att 5; #croche
+sar;
+sgo 67 ;#sol
+att 10; #noir
+sar; 
+sgo 67 ;#sol
+att 10; #noir
+sar; 
+sgo 67 ;#sol
+att 5; #croche
+sar; 
+sgo 69 ;#la
+att 10; #croche
+sar;  #l2m1
+
+sgo 59 ;# si
+att 10; #noir
+sar;
+sgo 59 ;# si
+att 10; #noir
+sar;
+sgo 69 ;#la
+att 10; #croche
+sar;  
+sgo 67 ;#sol
+att 5; #croche
+sar; 
+sgo 69 ;#la
+att 10; #croche
+sar;  
+sgo 62 ;#re
+att 10; #noir
+sar;
 att 10;
+sgo 62 ;#re
+att 5; #croche
 sar;
-sgo 62 ;
-att 10;
+sgo 64 ;#mi
+att 5; #croche
 sar;
-sgo 62 ;
-att 5;
+sgo 65 ;#fa
+att 10; #noir
 sar;
-sgo 64 ;
-att 5;
-sar;
-sgo 65 ;
-att 10;
-sar;
-sgo 65 ;
-att 10;
+sgo 65 ;#fa
+att 10; #noir
+sar;  
+sgo 67 ;#sol
+att 10; #noir
+sar; 
+sgo 69 ;#la
+att 10; #croche
+sar;  
+sgo 62 ;#re
+att 10; #noir
 sar;
 fin ; # ended
