@@ -27,7 +27,7 @@ uint16_t fbc(unsigned char op, uint16_t instructionCounter, uint16_t currentInst
 }
 
 void att(unsigned char op){
-	for(int i = op; i > 0; i--){
+	for(; op > 0; op --){
 	_delay_ms(25);
 	}
 }

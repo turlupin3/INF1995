@@ -29,6 +29,11 @@ void setupPWMNote(){
 uint16_t calculOCR1A(double frequence){
 	return F_CPU/2/frequence;
 }
+void arreterJouer(){
+	TCCR1B &= ~(1 << CS10); //set prescaler to 0 / stop counting
+	TCCR1B &= ~(1 << CS11);
+	TCCR1B &= ~(1 << CS12);
+}
 
 void jouerNote(uint8_t note){
 	

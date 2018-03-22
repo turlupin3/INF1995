@@ -1,18 +1,26 @@
 dbt ; # started, other command are: sgo xx : sar : att x25
 sgo 57 ;
-att 15 ; 
+att 5 ; 
+sar;
 sgo 60 ;
-att 15;
+att 5;
+sar;
 sgo 62 ;
-att 30;
+att 10;
+sar;
 sgo 62 ;
-att 30;
+att 10;
+sar;
 sgo 62 ;
 att 5;
+sar;
 sgo 64 ;
 att 5;
+sar;
 sgo 65 ;
 att 10;
+sar;
 sgo 65 ;
 att 10;
+sar;
 fin ; # ended

@@ -16,11 +16,11 @@ struct operation{
 	unsigned char operande;
 	};
 
-void delay_ms(double ms){
-	for(; ms >0 ; ms--){
-		_delay_ms(1);
-	}
-}
+//~ void delay_ms(double ms){
+	//~ for(; ms >0 ; ms--){
+		//~ _delay_ms(1);
+	//~ }
+//~ }
 
 //~ void att(unsigned char op){
 	
@@ -187,6 +187,8 @@ int main(){
 						i =	fbc(operations[i].operande, instructionCounter, i,counter);
 						break;
 			case 0x48 : jouerNote(operations[i].operande);
+						break;
+			case 0x09 : arreterJouer();
 						break;
 			case 0x60 :
 					arreterMoteur();
