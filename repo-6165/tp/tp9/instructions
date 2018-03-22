@@ -1,9 +1,17 @@
 dbt ;# début de l'exécution
 dal 1;
 sgo 65;
-mav 50;
 att 50;
-det 1;
-mar;
 sar;
+det 1;
+att 50;
+mav 255;
+att 50;
+mar;
+att 50;
+trd;
+att 50;
+trg;
+att 50;
+mre 255;
 fin ; // fin de l'execution

@@ -127,9 +127,6 @@ int main(){
 	//_delay_ms(5000);
 	demarrage();
 
-	while(true){
-	}
-
 	
 	Memoire24CXXX memoire = Memoire24CXXX();
 	
@@ -152,7 +149,6 @@ int main(){
 		memoire.ecriture(i, receptionUART());
 	}
 	
-	_delay_ms(1000);
 
 	unsigned char byteCode[tailleByteCode];
 	
@@ -198,15 +194,12 @@ int main(){
 						break;
 			case 0x60 :
 					arreterMoteur();
-					//~ arreterMoteur2();
 					break;
 			case 0x61 :
 					arreterMoteur();
-					//~ arreterMoteur2();
 					break;
 			case 0x62 :
-					//avancerMoteur(operations[i].operande);
-					avancerMoteur2(operations[i].operande);
+					avancerMoteur(operations[i].operande);
 					break;
 			case 0x63 :
 					reculerMoteur(operations[i].operande);
