@@ -86,10 +86,10 @@ sgo 69 ;#la
 att 10; #croche
 sar;  #l2m1
 
-sgo 71 ;# si
+sgo 70 ;# si
 att 10; #noir
 sar;
-sgo 71 ;# si
+sgo 70 ;# si
 att 10; #noir
 sar;
 sgo 69 ;#la
@@ -104,7 +104,8 @@ sar;
 sgo 62 ;#re
 att 10; #noir
 sar;
-att 10;
+dal 1;
+att 5;
 sgo 62 ;#re
 att 5; #croche
 sar;
@@ -189,7 +190,7 @@ att 10; #noir
 sar;
 sgo 76 ;#mi4
 att 10; #noir
-sar
+sar;
 sgo 74 ;#re4
 att 5; #croche
 sar;
