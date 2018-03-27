@@ -1,0 +1,242 @@
+dbt ; # started, other command are: sgo xx : sar : att x25
+
+dbc 1;
+
+sgo 57 ;#la
+att 5 ; #croche
+sar;
+sgo 60 ;#do
+att 5; #croche
+sar;
+sgo 62 ;#re
+att 10; #noir
+sar;
+sgo 62 ;#re
+att 10; #noir
+sar;
+sgo 62 ;#re
+att 5; #croche
+sar;
+sgo 64 ;#mi
+att 5; #croche
+sar;
+sgo 65 ;#fa
+att 10; #noir
+sar;
+sgo 65 ;#fa
+att 10; #noir
+sar;  
+sgo 65 ;#fa
+att 5; #croche
+sar;
+sgo 67 ;#sol
+att 5; #croche
+sar; #l2m1
+
+sgo 64 ; #mi
+att 10; #noir
+sar;
+sgo 64 ; #mi
+att 10; #noir
+sar;
+sgo 62 ; #re
+att 5; #croche
+sar;
+sgo 60 ; #do
+att 5; #croche
+sar;
+sgo 60 ; #do
+att 5; #croche
+sar;
+sgo 62 ; #re
+att 10; #croche
+sar;
+att 5; #croche S
+
+fbc;
+
+sgo 57 ;#la
+att 5 ; #croche
+sar;
+sgo 60 ;#do
+att 5; #croche
+sar;
+sgo 62 ;#re
+att 10; #noir
+sar;
+sgo 62 ;#re
+att 10; #noir
+sar;
+sgo 62 ;#re
+att 5; #croche
+sar;
+sgo 65 ;#fa
+att 5; #croche
+sar;
+sgo 67 ;#sol
+att 10; #noir
+sar; 
+sgo 67 ;#sol
+att 10; #noir
+sar; 
+sgo 67 ;#sol
+att 5; #croche
+sar; 
+sgo 69 ;#la
+att 10; #croche
+sar;  #l2m1
+
+sgo 71 ;# si
+att 10; #noir
+sar;
+sgo 71 ;# si
+att 10; #noir
+sar;
+sgo 69 ;#la
+att 10; #croche
+sar;  
+sgo 67 ;#sol
+att 5; #croche
+sar; 
+sgo 69 ;#la
+att 10; #croche
+sar;  
+sgo 62 ;#re
+att 10; #noir
+sar;
+att 10;
+sgo 62 ;#re
+att 5; #croche
+sar;
+sgo 64 ;#mi
+att 5; #croche
+sar;
+sgo 65 ;#fa
+att 10; #noir
+sar;
+sgo 65 ;#fa
+att 10; #noir
+sar;  
+sgo 67 ;#sol
+att 10; #noir
+sar; 
+sgo 69 ;#la
+att 10; #croche
+sar;  
+sgo 62 ;#re
+att 10; #noir
+sar;
+att 5;
+sgo 62 ;#re
+att 5; #croche
+sar;
+sgo 65 ;#fa
+att 5; #croche
+sar;
+sgo 64 ; #mi
+att 10; #noir
+sar;
+sgo 64 ; #mi
+att 10; #noir
+sar;
+sgo 65 ;#fa
+att 5; #croche
+sar;
+sgo 62 ;#re
+att 5; #croche
+sar;
+sgo 64 ; #mi
+att 10; #noir
+sar;
+att 10;
+
+dbc 1;
+
+sgo 69 ;#la4
+att 5; #croche
+sar;
+sgo 72 ;#do4
+att 5; #croche
+sar;
+sgo 74 ;#re4
+att 10; #noir
+sar;
+sgo 74 ;#re4
+att 10; #noir
+sar;
+sgo 74 ;#re4
+att 5; #croche
+sar;
+sgo 76 ;#mi4
+att 10; #noir
+sar;
+sgo 77 ;#fa
+att 10; #noir
+sar;
+sgo 77 ;#fa
+att 10; #noir
+sar;
+sgo 77 ;#fa
+att 5; #croche
+sar;
+sgo 79 ;#sol
+att 5; #croche
+sar; #l4m1
+
+
+sgo 76 ;#mi4
+att 10; #noir
+sar;
+sgo 76 ;#mi4
+att 10; #noir
+sar;
+sgo 74 ;#re4
+att 5; #croche
+sar;
+sgo 72 ;#do4
+att 5; #croche
+sar;
+sgo 72 ;#do4
+att 5; #croche
+sar;
+sgo 74 ;#re4
+att 10; #noir
+sar;
+att 5;
+
+fbc;
+
+att 5;
+
+sgo 69 ;#la4
+att 5; #croche
+sar;
+sgo 72 ;#do4
+att 5; #croche
+sar;
+sgo 74 ;#re4
+att 10; #noir
+sar;
+sgo 74 ;#re4
+att 10; #noir
+sar;
+sgo 74 ;#re4
+att 5; #croche
+sar;
+sgo 77 ;#fa
+att 5; #croche
+sar;
+sgo 79 ;#sol
+att 10; #noir
+sar; 
+sgo 79 ;#sol
+att 10; #noir
+sar; 
+sgo 79 ;#sol
+att 5; #croche
+sar; 
+sgo 81 ;#la
+att 5; #croche
+sar; 
+
+fin ; # ended
