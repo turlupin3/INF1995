@@ -1,3 +1,5 @@
+	
+	void main() {
 	demarrage();
 	Memoire24CXXX memoire = Memoire24CXXX();
 	initialisationUART();
@@ -41,13 +43,21 @@
 			delSwitcher(instruc.donnee);
 			break;
 		case 0xfb: // requete denvoi des information didentification
-		
+			envoieInfo();
 			break;
 		default:
 		//error
 		
 		
 	}
-
+}
+	void envoieInfo() {
+		uint8_t info;
+		for (int i = 0; i < 30; i++){
+			info = lecture(adresse, *info);
+			transmissionUART(info);
+		}
+		
+	}
 
 

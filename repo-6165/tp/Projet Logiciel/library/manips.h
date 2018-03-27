@@ -6,8 +6,8 @@
 
 void debut(bool & boolDebut);
 void fin(bool & boolFin);
-uint16_t dbc(unsigned char op, uint16_t instructionCounter,uint16_t & counter);
-uint16_t fbc(unsigned char op, uint16_t instructionCounter, uint16_t currentInstruction,uint16_t & counter);
+uint16_t dbc(unsigned char op);
+uint16_t fbc(unsigned char & counter, uint16_t & debutBoucle, uint16_t & nextInstruction);
 void att(unsigned char op);
 void det(unsigned char op);
 void dal(unsigned char op);

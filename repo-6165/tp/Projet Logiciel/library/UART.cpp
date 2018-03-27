@@ -35,7 +35,7 @@ void transmissionUART ( uint8_t donnee ) {
 
 unsigned char receptionUART (){
 	
-	while(!(UCSR0A & (1<<RXC0))){
+	while( !(UCSR0A & (1<<RXC0)) ){
 		//wait for data
 		DDRA=0xff;
 		PORTA = 1;	//portA devient rouge during wait

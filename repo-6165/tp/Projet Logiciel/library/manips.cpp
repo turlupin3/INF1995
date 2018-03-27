@@ -12,18 +12,17 @@ void fin(bool & boolFin) {
 
 
 
-uint16_t dbc(unsigned char op, uint16_t instructionCounter,uint16_t & counter) {
+uint16_t dbc(unsigned char op) {
 	//debut de boucle
-	counter = op;
-	return instructionCounter;
+	return op;
 }
-uint16_t fbc(unsigned char op, uint16_t instructionCounter, uint16_t currentInstruction,uint16_t & counter) {
+uint16_t fbc(unsigned char & counter,uint16_t & debutBoucle, uint16_t & nextInstruction) {
 	//fin de boucle
 	if (counter > 0) { //maybe use counter+1
 		counter--;
-		return instructionCounter +1; //maybe no ++
+		return debutBoucle; //maybe no ++
 	}
-	return currentInstruction;
+	return nextInstruction;
 }
 
 void att(unsigned char op){
