@@ -9,3 +9,7 @@ const uint8_t OFF = 0b00000000;
 
 
 void ambre();
+void delVert();
+void delRouge();
+void delOff();
+void delSwitcher(unsigned char order);

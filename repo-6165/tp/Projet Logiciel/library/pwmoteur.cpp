@@ -79,18 +79,20 @@ void avancerMoteur(unsigned char op) {
    // PORTB |= 0b101000;
 	
 }
-//~ void avancerMoteur2(unsigned char op) {
-	//~ DDRB = 0xff;
-	//~ TCNT0 = 0x0;
+void avancerMoteurG(unsigned char op) {
+	//avancer
+	setUpPWMoteur();
+	OCR0B = op;
+   // PORTB |= 0b101000;
 	
-	//~ OCR0B = op;
-	//~ OCR0A = op;
-	//~ TCCR0A |= (1 << WGM10);
-	//~ TCCR0A |= (1 << COM1A1);
-	//~ TCCR0A |= (1 << COM1B1);
-	//~ TCCR0B |= (1 << CS11);
-	//~ TCCR1C = 0;
-//~ }
+}
+void avancerMoteurD(unsigned char op) {
+	//avancer
+	setUpPWMoteur();
+	OCR0A = op;
+   // PORTB |= 0b101000;
+	
+}
 void reculerMoteur(unsigned char op) {
 	//reculer
 	
