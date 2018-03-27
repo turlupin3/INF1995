@@ -1,0 +1,5 @@
+progmem -v -o instructionsBytecode instructions
+
+serieViaUSB -e -f instructionsBytecode
+
+

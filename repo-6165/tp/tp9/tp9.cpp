@@ -16,11 +16,11 @@ struct operation{
 	unsigned char operande;
 	};
 
-void delay_ms(double ms){
-	for(; ms >0 ; ms--){
-		_delay_ms(1);
-	}
-}
+//~ void delay_ms(double ms){
+	//~ for(; ms >0 ; ms--){
+		//~ _delay_ms(1);
+	//~ }
+//~ }
 
 //~ void att(unsigned char op){
 	
@@ -122,8 +122,11 @@ void delay_ms(double ms){
 
 int main(){
 	
-	
+	//DDRB = 0xff;
+	//PORTB = 0b101000;
+	//_delay_ms(5000);
 	demarrage();
+
 	
 	Memoire24CXXX memoire = Memoire24CXXX();
 	
@@ -146,7 +149,12 @@ int main(){
 		memoire.ecriture(i, receptionUART());
 	}
 	
-	_delay_ms(1000);
+	//~ uint8_t octet1= 0;
+	//~ uint8_t octet2= 0;
+	
+	//~ memoire.lecture(0, &octet1);
+	//~ memoire.lecture(1, &octet2);
+	//~ uint16_t tailleByteCode = (octet1 << 8) + (octet2);
 
 	unsigned char byteCode[tailleByteCode];
 	
@@ -188,7 +196,12 @@ int main(){
 						break;
 			case 0x48 : jouerNote(operations[i].operande);
 						break;
+			case 0x09 : arreterJouer();
+						break;
 			case 0x60 :
+					arreterMoteur();
+					break;
+			case 0x61 :
 					arreterMoteur();
 					break;
 			case 0x62 :
