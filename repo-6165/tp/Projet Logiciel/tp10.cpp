@@ -84,7 +84,8 @@ int main(){
 						compteur = dbc(op.instruction);
 						break;
 			case 0xC1 :
-						uint16_t finBoucle = i+2;
+						uint16_t finBoucle;
+						finBoucle = i+2;
 						i =	fbc(compteur, debutBoucle, finBoucle);
 						break;
 			case 0x48 : 
