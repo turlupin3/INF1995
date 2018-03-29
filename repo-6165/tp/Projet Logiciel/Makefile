@@ -29,7 +29,7 @@ PROJECTNAME=tp10
 # Utilisez le suffixe .cpp pour les fichiers C++
 # Listez tous les fichiers a compiler, separes par
 # un espace. exemple: 'tp1.c tp2.cpp':
-PRJSRC=tp10.cpp
+PRJSRC=tp10-1.cpp
 
 # Inclusions additionnels (ex: -I/path/to/mydir)
 INC= -I library

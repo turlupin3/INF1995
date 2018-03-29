@@ -2,16 +2,16 @@
 #include <ambre.h>
 
 void ambre(){
-	PORTA = VERT;
+	PORTA = VERTDEL;
 	_delay_ms(1.0);
-	PORTA = ROUGE;
+	PORTA = ROUGEDEL;
 	_delay_ms(1.0);
 }
 void delVert(){
-	PORTA = VERT;
+	PORTA = VERTDEL;
 }
 void delRouge(){
-	PORTA = ROUGE;
+	PORTA = ROUGEDEL;
 }
 void delOff(){
 	PORTA = 0;

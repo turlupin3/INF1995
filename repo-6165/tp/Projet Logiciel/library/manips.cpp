@@ -20,7 +20,7 @@ uint16_t fbc(unsigned char & counter,uint16_t & debutBoucle, uint16_t & nextInst
 	//fin de boucle
 	if (counter > 0) { //maybe use counter+1
 		counter--;
-		return debutBoucle; //maybe no ++
+		return debutBoucle + 2; //maybe no ++
 	}
 	return nextInstruction;
 }

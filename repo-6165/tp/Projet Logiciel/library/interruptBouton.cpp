@@ -1,8 +1,7 @@
-#include <InterruptBouton.h> 
-
-volatile uint8_t boutonPoussoir = 0;
+#include <interruptBouton.h> 
 
 bool antiRebond(){
+	DDRD = 0x00;
 	bool estEnfonce = false;
 	if(PIND & 0x04){
 		_delay_ms(10.0);
@@ -28,9 +27,15 @@ void initialisation(){
 
 ISR(INT0_vect){
 
-	if(antiRebond()){
+	while(antiRebond()){
 		boutonPoussoir = 1;
 		}
 	
+	boutonPoussoir = 0;
 	EIFR |= (1 << INTF0);
+}
+
+uint8_t getBouton(){
+	
+	return boutonPoussoir;
 }
