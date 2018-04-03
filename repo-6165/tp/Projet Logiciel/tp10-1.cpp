@@ -5,13 +5,18 @@
 #include <note.h>
 #include <manips.h>
 #include <ambre.h>
-#include <interruptBouton.h>
+//#include <interruptBouton.h>
 
 //~ volatile uint8_t boutonPoussoir = 1;	
 //~ unsigned char capteurGauche = 0;
 //~ unsigned char capteurDroit = 0;	
-void envoieInfo(Memoire24CXXX memoire, uint8_t *tableau);
+volatile uint8_t boutonPoussoir = 0;
 
+void envoieInfo(Memoire24CXXX memoire, uint8_t *tableau);
+ISR(INT0_vect);
+bool antiRebond();
+void initialisation();
+uint8_t getBouton();
 int main() {
 	demarrage();
 	Memoire24CXXX memoire = Memoire24CXXX();
@@ -99,14 +104,54 @@ for(;;){
 			tableau[33] = 0xf5;
 			tableau[34] = getBouton();
 			tableau[35] = 0xf6;
-			tableau[36] = capteurGauche;
+			tableau[36] = capteurGauche;/// IS TEST
 			tableau[37] = 0xf7;
-			tableau[38] = capteurDroit;
+			tableau[38] = capteurDroit;/// IS TEST
 			
 			info = tableau[i];
 			transmissionUART(info);
 		}
 		
 	}
+////////////////////////////////////////////////////////////////////////
+bool antiRebond(){
+	DDRD = 0x00;
+	bool estEnfonce = false;
+	if(PIND & 0x04){
+		_delay_ms(10.0);
+		if(PIND & 0x04){
+		estEnfonce = true;;
+		}
+	}
+	return estEnfonce;
+}
+
+
+void initialisation(){
+	cli();
+	DDRA = 0xff;
+	DDRD = 0x00;
+	
+	
+	EIMSK |= (1 << INT0);
+	EICRA |= (0 << ISC01) | (1 << ISC00); // set external interupt on pin INT0 with option any logical change generate an interupt request
+
+	sei();
+}
+
+ISR(INT0_vect){
+
+	while(antiRebond()){
+		boutonPoussoir = 1;
+		}
+	
+	boutonPoussoir = 0;
+	EIFR |= (1 << INTF0);
+}
+
+uint8_t getBouton(){
+	
+	return boutonPoussoir;
+}
 
 
