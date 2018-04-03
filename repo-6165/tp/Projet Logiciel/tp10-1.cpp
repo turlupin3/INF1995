@@ -10,8 +10,8 @@
 //~ volatile uint8_t boutonPoussoir = 1;	
 //~ unsigned char capteurGauche = 0;
 //~ unsigned char capteurDroit = 0;	
-volatile uint8_t boutonPoussoir = 0;
-
+volatile uint8_t boutonPoussoir = 0x01;
+volatile bool boole = 0x01;
 void envoieInfo(Memoire24CXXX memoire, uint8_t *tableau);
 ISR(INT0_vect);
 bool antiRebond();
@@ -70,9 +70,11 @@ int main() {
 		
 	operation op;	 
 for(;;){ 
+		
+			
 		op.instruction= receptionUART();
 		op.operande = receptionUART();
-		
+	//	envoieInfo(memoire, tableauEcriture);// it doest not excute
 		switch (op.instruction) {
 			case 0xf8: //vitesse de roue gauche
 				avancerMoteurD(op.operande);
@@ -90,12 +92,17 @@ for(;;){
 				//error
 				break;
 		}
+		
 	}	
 	
 	
 	return 0;
 }
 	void envoieInfo(Memoire24CXXX memoire, uint8_t *tableau) {
+		jouerNote(45);
+		_delay_ms(500);
+		arreterJouer();
+		
 		unsigned char capteurGauche = 0;
 		unsigned char capteurDroit = 0;	
 		uint8_t info;
@@ -103,6 +110,8 @@ for(;;){
 			
 			tableau[33] = 0xf5;
 			tableau[34] = getBouton();
+			//tableau[34] = 0x00;//enfoncer
+			//tableau[34] = 0x01;//relacher
 			tableau[35] = 0xf6;
 			tableau[36] = capteurGauche;/// IS TEST
 			tableau[37] = 0xf7;
@@ -140,12 +149,12 @@ void initialisation(){
 }
 
 ISR(INT0_vect){
-
-	while(antiRebond()){
-		boutonPoussoir = 1;
-		}
-	
-	boutonPoussoir = 0;
+	//rising and failling edge
+	_delay_ms(25);
+	boole = !boole;
+	transmissionUART(0xf5);
+	transmissionUART(boole);
+		
 	EIFR |= (1 << INTF0);
 }
 

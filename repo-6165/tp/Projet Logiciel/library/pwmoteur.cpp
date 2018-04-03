@@ -80,13 +80,24 @@ void avancerMoteur(unsigned char op) {
 	
 }
 void avancerMoteurG(unsigned char op) {
+	if (0=<op) {
+		///put direction here
+	}
+	else {
+		
+	}
 	//avancer
 	setUpPWMoteur();
 	OCR0B = op;
    // PORTB |= 0b101000;
-	
 }
 void avancerMoteurD(unsigned char op) {
+	if (0=<op) {
+		///put the direction here
+	}
+	else {
+		///inverse direction here
+	}
 	//avancer
 	setUpPWMoteur();
 	OCR0A = op;
