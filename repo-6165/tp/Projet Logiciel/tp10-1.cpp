@@ -5,6 +5,7 @@
 #include <note.h>
 #include <manips.h>
 #include <ambre.h>
+#include <can.h>
 
 void envoieInfo(Memoire24CXXX memoire, uint8_t *tableau);
 void ecrireTableau(uint8_t *tableauEcriture);
@@ -15,15 +16,22 @@ uint8_t getBouton();
 
 void partirMinuterie ( uint32_t duree );
 
+//capteur
+uint8_t lecture8Bit(can& conv, uint8_t pos);
+
 volatile uint8_t boutonPoussoir = 0x01;
 volatile bool boole = 0x01;
-
+//capteur
+//volatile can  convertisseurD = can();
+//
 int main() {
 	demarrage();
 	Memoire24CXXX memoire = Memoire24CXXX();
 	initialisationUART();
 	initialisationInt();
 	setUpPWMoteur();
+	
+	
 	
 	uint8_t tableauEcriture[39];
 	ecrireTableau(tableauEcriture);
@@ -169,16 +177,20 @@ uint8_t getBouton(){
 //partirMinuterie(100000);
 //
 ISR ( TIMER2_COMPA_vect  ) {
-	jouerNote(45);
-	_delay_ms(200);
-	arreterJouer();
-
-	
-	
-	//transmissionUART(0xf6);
-	//transmissionUART(capteurGauche());
-	//transmissionUART(0xf7);
-	//transmissionUART(capteurDroit());
+	//~ jouerNote(45);
+	//~ _delay_ms(200);
+	//~ arreterJouer();
+	DDRA = 0x00;
+	can  convertisseurD = can();
+	can  convertisseurG = can();
+	uint8_t lectureDonneeD = lecture8Bit(convertisseurD, 5);
+	uint8_t lectureDonneeG = lecture8Bit(convertisseurG, 4);
+	double interD = 2478.633156*(pow(lectureDonneeD,-1.125));
+	double interG = 2478.633156*(pow(lectureDonneeG,-1.125));
+	transmissionUART(0xf6);
+	transmissionUART(interD);
+	transmissionUART(0xf7);
+	transmissionUART(interG);
 
 }
 
@@ -208,5 +220,10 @@ TCCR2B |= (1 << CS20);
 
 TIMSK2 |= (1 << OCIE2A);
 
+}
+////////////////////////////////////////////////////////////////////////
+uint8_t lecture8Bit(can& conv, uint8_t pos){
+	return conv.lecture(pos) >> 2;
+	//return 2478,633156*((conv.lecture(pos) >> 2)^-1.125);
 }
 ////////////////////////////////////////////////////////////////////////
