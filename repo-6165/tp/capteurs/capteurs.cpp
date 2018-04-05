@@ -5,6 +5,8 @@
 // PORTB pour moteur
 // PORTD pour son
 // PORTC pour DEL
+// 94 = 15 cm selon la fonction
+// 27 = 60 cm selon la fonction
 
 // verifier les commentaires (arbitraire)
 
@@ -127,7 +129,7 @@ int main(){
 	return 0; 
 }
 
-// fait le decalage de deux bit CAN 2 des 10 bits sont inutilise
+// fait le decalage de deux bit CAN car 2 des 10 bits sont inutilises
 uint8_t lecture8Bit(can& conv, uint8_t pos){
 	return conv.lecture(pos) >> 2;
 }
@@ -161,7 +163,7 @@ void lectureCapteurs(){
 
 void ajustementDroite(){
 	// si le robot se dirige vers le panneau on fait tourner la roue droite
-	// plus vite. Ensuite, on fait tourner la gauche pour le remettre parallele
+	// plus vite.
 	PORTC = ROUGE;
 	if (lectureDonneeD > 94){	// si distance < 15cm
 		if (OCR0A + 50 > 255) // 50 est arbitraire
@@ -186,7 +188,7 @@ void ajustementDroite(){
 	}
 	
 	// si le robot s'eloigne du panneau on fait tourner la roue gauche
-	// plus vite. Ensuite, on fait tourner la droite pour le remettre parallele
+	// plus vite.
 	if (lectureDonneeD < 94){ // si distance > 15cm
 		if (OCR0B + 50 > 255) // 50 est arbitraire
 			OCR0B = 255;
@@ -214,7 +216,7 @@ void ajustementDroite(){
 void ajustementGauche(){
 	
 	// si le robot se dirige vers le panneau on fait tourner la roue gauche
-	// plus vite. Ensuite, on fait tourner la droite pour le remettre parallele
+	// plus vite.
 	PORTC = ROUGE;
 	if (lectureDonneeG > 94){ // si distance < 15cm
 		if (OCR0B + 50 > 255) // 50 est arbitraire
@@ -239,7 +241,7 @@ void ajustementGauche(){
 	}
 	
 	// si le robot s'eloigne du panneau on fait tourner la roue droite
-	// plus vite. Ensuite, on fait tourner la gauche pour le remettre parallele
+	// plus vite.
 	if (lectureDonneeG < 94){ // si distance > 18cm
 		if (OCR0A + 50 > 255) // 50 est arbitraire
 			OCR0A = 255;
@@ -265,6 +267,8 @@ void ajustementGauche(){
 }
 
 void faireLeTourDroite(){
+	// un roue tourne plus vite et l'autre moins vite pour contourner le panneau
+	// jusqu'a temps que le capteur capte 15cm
 	PORTC = ROUGE;
 	if (OCR0B + 50 > 255) // 50 est arbitraire
 		OCR0B = 255;
@@ -302,6 +306,9 @@ void faireLeTourGauche(){
 
 void changerPanneau(){
 	PORTC = ROUGE;
+	// La roue droite va tourner plus vite pendant quelque temps pour
+	// que le bot s'oriente vers le panneau gauche. Ensuite les roues 
+	// sont a la meme vitesse pour qu'il se dirige droit vers le panneau gauche
 	if (longerDroite == true){
 		if (OCR0A + 50 > 255) // 50 est arbitraire
 		OCR0A = 255;
@@ -315,6 +322,7 @@ void changerPanneau(){
 		longerGauche == true;
 	}
 	
+	// meme chose mais avec la roue gauche
 	else{
 		if (OCR0B + 50 > 255) // 50 est arbitraire
 		OCR0B = 255;
@@ -332,7 +340,7 @@ void changerPanneau(){
 }
 
 
-
+// les trois fonctions suivantes pour l'interrupt
 bool antiRebond(){
 	bool estEnfonce = false;
 	if(PIND & 0x04){
