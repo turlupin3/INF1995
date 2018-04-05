@@ -73,7 +73,6 @@ void controleMoteurG(int8_t op) {
 	
 	uint8_t tmp = op *2.55;
 	OCR0B = tmp;
-	//OCR0A = tmp;
 	
 }
 void controleMoteurD(int8_t op) {
@@ -89,7 +88,6 @@ void controleMoteurD(int8_t op) {
 	}
 	
 	uint8_t tmp = op *2.55;
-	//OCR0B = tmp;
 	OCR0A = tmp;
 	
 }
