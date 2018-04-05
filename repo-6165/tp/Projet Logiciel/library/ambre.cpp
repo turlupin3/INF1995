@@ -22,10 +22,10 @@ void delSwitcher(unsigned char order){
 		delOff();
 		break;
 		case 1:
-		delVert();
+		delRouge();
 		break;
 		case 2:
-		delRouge();
+		delVert();
 		break;
 		default:
 		ambre();

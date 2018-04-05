@@ -6,9 +6,9 @@
 
 void setUpPWMoteur();
 void arreterMoteur();
-void avancerMoteur(unsigned char op);
-void avancerMoteurG(unsigned char op);
-void avancerMoteurD(unsigned char op);
+void controleMoteur(int8_t op);
+void controleMoteurG(int8_t op);
+void controleMoteurD(int8_t op);
 void reculerMoteur(unsigned char op);
 void tournerDroite();
 void tournerGauche();

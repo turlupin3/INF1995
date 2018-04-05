@@ -8,15 +8,29 @@
 
 void envoieInfo(Memoire24CXXX memoire, uint8_t *tableau);
 void ecrireTableau(uint8_t *tableauEcriture);
+ISR(INT0_vect);
+bool antiRebond();
+void initialisationInt();
+uint8_t getBouton();
+
+void partirMinuterie ( uint32_t duree );
+
+volatile uint8_t boutonPoussoir = 0x01;
+volatile bool boole = 0x01;
 
 int main() {
 	demarrage();
 	Memoire24CXXX memoire = Memoire24CXXX();
 	initialisationUART();
-
-
+	initialisationInt();
+	setUpPWMoteur();
+	
 	uint8_t tableauEcriture[39];
 	ecrireTableau(tableauEcriture);
+	
+	//
+	partirMinuterie(90000000);
+	//
 	
 	memoire.ecriture(0, tableauEcriture, 39);
 
@@ -28,7 +42,7 @@ int main() {
 	
 	struct operation{
 		unsigned char instruction; 
-		unsigned char operande;
+		int8_t operande;
 		};
 		
 	operation op;	 
@@ -38,10 +52,10 @@ for(;;){
 		
 		switch (op.instruction) {
 			case 0xf8: //vitesse de roue gauche
-				avancerMoteur(op.operande);
+				controleMoteurG(op.operande);
 				break;
 			case 0xf9: //vitesse de rouge droite
-				avancerMoteur(op.operande);
+				controleMoteurD(op.operande);
 				break;
 			case 0xfa: // couleur de la del libre
 				delSwitcher(op.operande);
@@ -65,7 +79,7 @@ for(;;){
 		for (int i = 0; i < 39; i++){
 			
 			tableau[33] = 0xf5;
-			tableau[34] = 0;
+			//tableau[34] = 0;
 			tableau[35] = 0xf6;
 			tableau[36] = capteurGauche;
 			tableau[37] = 0xf7;
@@ -101,9 +115,98 @@ for(;;){
 		tableauEcriture[31] = 0xf4;
 		tableauEcriture[32] = 1;
 		tableauEcriture[33] = 0xf5;
-		tableauEcriture[34] = 0;
+		tableauEcriture[34] = 1;
 		tableauEcriture[35] = 0xf6;
 		tableauEcriture[36] = 0;
 		tableauEcriture[37] = 0xf7;
 		tableauEcriture[38] = 0;
 	}
+////////////////////////////////////////////////////////////////////////
+bool antiRebond(){
+	DDRD = 0x00;
+	bool estEnfonce = false;
+	if(PIND & 0x04){
+		_delay_ms(10.0);
+		if(PIND & 0x04){
+		estEnfonce = true;;
+		}
+	}
+	return estEnfonce;
+}
+
+
+void initialisationInt(){
+	cli();
+	DDRA = 0xff;
+	DDRD = 0x00;
+	
+	
+	EIMSK |= (1 << INT0);
+	EICRA |= (0 << ISC01) | (1 << ISC00); // set external interupt on pin INT0 with option any logical change generate an interupt request
+
+	sei();
+}
+
+ISR(INT0_vect){
+	//rising and failling edge
+	_delay_ms(25);
+	boole = !boole;
+	transmissionUART(0xf5);
+	transmissionUART(boole);
+		
+	EIFR |= (1 << INTF0);
+}
+
+uint8_t getBouton(){
+	
+	return boutonPoussoir;
+}
+
+////////////////////////////////////////////////////////////////////////
+//Partie Timer
+
+//main here
+//partirMinuterie(100000);
+//
+ISR ( TIMER2_COMPA_vect  ) {
+	jouerNote(45);
+	_delay_ms(200);
+	arreterJouer();
+
+	
+	
+	//transmissionUART(0xf6);
+	//transmissionUART(capteurGauche());
+	//transmissionUART(0xf7);
+	//transmissionUART(capteurDroit());
+
+}
+
+void partirMinuterie ( uint32_t duree ) {
+
+
+
+// mode CTC du timer 1 avec horloge divisée par 1024
+
+// interruption après la durée spécifiée
+
+TCNT2 = 0;
+
+OCR2A = duree;
+
+TCCR2A |= (0 << COM2A1);
+TCCR2A |= (0 << COM2B1);
+TCCR2A |= (0 << COM2A0);
+TCCR2A |= (0 << COM2B0);
+
+TCCR2B |= (1 << CS22);
+TCCR2B |= (1 << CS21);
+TCCR2B |= (1 << CS20);
+
+
+//TCCR1C = 0;
+
+TIMSK2 |= (1 << OCIE2A);
+
+}
+////////////////////////////////////////////////////////////////////////

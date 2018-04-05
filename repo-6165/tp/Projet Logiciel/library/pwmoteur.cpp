@@ -22,11 +22,6 @@ void setUpPWMoteur(){
 	
 	OCR0B = 0;
 	OCR0A = 0;
-	
-	TIMSK0 |= (1 << OCIE0A);
-	TIMSK0 |= (1 << OCIE0B);
-	//TIMSK0 |= (1 << OCR0A);
-	//TIMSK0 |= (1 << OCR0B);
 
 }
 
@@ -47,61 +42,55 @@ void arreterMoteur(){
 	
 }
 
-//~ void arreterMoteur2(){
-	//~ //avancerMoteur(0);
-	//~ //DDRB = 0xff;
-	//~ //PORTB = 0;
-
-	//~ cli ();
-	//~ EIMSK |= (1 << INT0) ; // EIMSK = 0b00000001
-	//~ EICRA |= (1 << ISC00);
-	//~ EICRA |= (1 << ISC01);
-	//~ sei ();
-
-	//~ //OCR1B = 0;
-	//~ //OCR1A = 0;
-	//~ OCR0A = 0;
-	//~ OCR0B = 0;
-
-	//~ TCCR0A |= (1 << WGM10);
-	//~ TCCR0A |= (1 << COM1A1);
-	//~ TCCR0A |= (1 << COM1B1);
-	//~ TCCR0B |= (1 << CS11);
-	//~ TCCR1C = 0;
-	//~ //DDRB=0x00;
-	//~ }
-
-void avancerMoteur(unsigned char op) {
+void controleMoteur(int8_t op) {
 	//avancer
-	setUpPWMoteur();
-	OCR0B = op;
-	OCR0A = op;
-   // PORTB |= 0b101000;
+	
+	
+	if(op > 0) {
+		PORTB =0;
+	}
+	else if(op < 0) {
+		PORTB = 0b00100100;
+		op *= (-1); // negate op
+	}
+	
+	uint8_t tmp = op *2.55;
+	OCR0B = tmp;
+	OCR0A = tmp;
 	
 }
-void avancerMoteurG(unsigned char op) {
-	if (0=<op) {
-		///put direction here
-	}
-	else {
-		
-	}
+
+void controleMoteurG(int8_t op) {
 	//avancer
-	setUpPWMoteur();
-	OCR0B = op;
-   // PORTB |= 0b101000;
+	if(op > 0) {
+		PORTB &= ~(1 << 5);
+	}
+	else if(op < 0) {
+		//PORTB = 0b00100100;
+		PORTB |= (1 << 5);
+		op *= (-1); // negate op
+	}
+	
+	uint8_t tmp = op *2.55;
+	OCR0B = tmp;
+	//OCR0A = tmp;
+	
 }
-void avancerMoteurD(unsigned char op) {
-	if (0=<op) {
-		///put the direction here
-	}
-	else {
-		///inverse direction here
-	}
+void controleMoteurD(int8_t op) {
 	//avancer
-	setUpPWMoteur();
-	OCR0A = op;
-   // PORTB |= 0b101000;
+	
+	
+	if(op > 0) {
+		PORTB &= ~(1 << 2);
+	}
+	else if(op < 0) {
+		PORTB |= (1 << 2);
+		op *= (-1); // negate op
+	}
+	
+	uint8_t tmp = op *2.55;
+	//OCR0B = tmp;
+	OCR0A = tmp;
 	
 }
 void reculerMoteur(unsigned char op) {
