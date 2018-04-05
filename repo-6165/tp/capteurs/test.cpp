@@ -12,9 +12,9 @@ uint8_t lecture8Bit(can& conv, uint8_t pos);
 int main()
 {	
 	DDRA = 0x00;
-	//DDRD = 0xff;
+	DDRD = 0xff;
 	
-	initialisationUART();
+	//~ initialisationUART();
 	
 	can convertisseurD = can();
 	uint8_t lectureDonneeD = 0;
@@ -23,18 +23,18 @@ int main()
 		
 		lectureDonneeD = lecture8Bit(convertisseurD, 5);
 
-		transmissionUART (lectureDonneeD);
+		//~ transmissionUART (lectureDonneeD);
 		
-		//~ if(lectureDonneeD <= 25){ 
-			//~ PORTD = ROUGE;
-		//~ }
-		//~ else if(lectureDonneeD >= 83){ 
-			//~ ambre();
-		//~ }
-		//~ else {
-			//~ PORTD = VERT;
+		if(lectureDonneeD <= 20){ 
+			ambre();
+		}
+		else if(lectureDonneeD >= 65){ 
+			PORTD = VERT;
+		}
+		else {
+			PORTD = ROUGE;
 			
-		//~ }
+		}
 	}
 
 	return 0; 
