@@ -7,8 +7,8 @@
 #include <ambre.h>
 #include <can.h>
 
-void envoieInfo(Memoire24CXXX memoire, uint8_t *tableau);
-void ecrireTableau(uint8_t *tableauEcriture);
+void envoieInfo(Memoire24CXXX memoire);
+void ecrireInfo(Memoire24CXXX memoire);
 ISR(INT0_vect);
 bool antiRebond();
 void initialisationInt();
@@ -30,23 +30,12 @@ int main() {
 	initialisationUART();
 	initialisationInt();
 	setUpPWMoteur();
+	partirMinuterie(90000000);	
 	
 	
-	
-	uint8_t tableauEcriture[39];
-	ecrireTableau(tableauEcriture);
-	
-	//
-	partirMinuterie(90000000);
-	//
-	
-	memoire.ecriture(0, tableauEcriture, 39);
-
-		uint8_t info;
-		for (int i = 0; i < 39; i++){
-			info = tableauEcriture[i];
-			transmissionUART(info);
-		}
+	//ecrireInfo(memoire);
+	_delay_ms(10);
+	envoieInfo(memoire);
 	
 	struct operation{
 		unsigned char instruction; 
@@ -69,7 +58,7 @@ for(;;){
 				delSwitcher(op.operande);
 				break;
 			case 0xfb: // requete denvoi des information didentification
-				envoieInfo(memoire, tableauEcriture);
+				//envoieInfo(memoire);
 				break;
 			default:
 				//error
@@ -80,54 +69,40 @@ for(;;){
 	
 	return 0;
 }
-	void envoieInfo(Memoire24CXXX memoire, uint8_t *tableau) {
-		unsigned char capteurGauche = 0;
-		unsigned char capteurDroit = 0;	
-		uint8_t info;
-		for (int i = 0; i < 39; i++){
-			
-			tableau[33] = 0xf5;
-			//tableau[34] = 0;
-			tableau[35] = 0xf6;
-			tableau[36] = capteurGauche;
-			tableau[37] = 0xf7;
-			tableau[38] = capteurDroit;
-			
-			info = tableau[i];
-			transmissionUART(info);
+	void envoieInfo(Memoire24CXXX memoire) {
+		uint8_t bit;
+		for (int i = 0; i < 33; i++){
+			memoire.lecture(i, &bit);
+			transmissionUART(bit);
 		}
 		
 	}
 
-	void ecrireTableau(uint8_t *tableauEcriture){
+	void ecrireInfo(Memoire24CXXX memoire){
 	
-		tableauEcriture[0] = 0xf0;
-		char nomRobot[13] = "J Rom Bot   ";
-		for (int i = 0; i < 9; i++) {
-			tableauEcriture[i+1] = nomRobot[i];
-		}
+		uint8_t addresseNomRobot = 0xf0;
+		uint8_t addresseNumeroEquipe = 0xf1;
+		uint8_t addresseNumeroSection = 0xf2;
+		uint8_t addresseSession = 0xf3;
+		uint8_t addresseCouleur = 0xf4;
 		
-		tableauEcriture[14] = 0xf1;
-		char numeroEquipe[9] = "6165    ";
-		for (int i = 0; i < 9; i++) {
-			tableauEcriture[i+15] = numeroEquipe[i];
-		}
-
-		tableauEcriture[24] = 0xf2;
-		tableauEcriture[25] = 3;
-		tableauEcriture[26] = 0xf3;
-		char session[4] = {'1','8','-','1'};
-		for (int i = 0; i < 4; i++) {
-			tableauEcriture[i+27] = session[i];
-		}
-		tableauEcriture[31] = 0xf4;
-		tableauEcriture[32] = 1;
-		tableauEcriture[33] = 0xf5;
-		tableauEcriture[34] = 1;
-		tableauEcriture[35] = 0xf6;
-		tableauEcriture[36] = 0;
-		tableauEcriture[37] = 0xf7;
-		tableauEcriture[38] = 0;
+		uint8_t nomRobot[13] = "JRomBot";
+		uint8_t numeroEquipe[9] = "6165";
+		uint8_t numeroSection = 3;
+		uint8_t session[4] = {'1','8','-','1'};
+		uint8_t couleur = 1;
+		
+		memoire.ecriture(0, addresseNomRobot);
+		memoire.ecriture(1, nomRobot, 13);
+		memoire.ecriture(14, addresseNumeroEquipe);
+		memoire.ecriture(15, numeroEquipe, 9);
+		memoire.ecriture(24, addresseNumeroSection);
+		memoire.ecriture(25, numeroSection);
+		memoire.ecriture(26, addresseSession);
+		memoire.ecriture(27, session, 4);
+		memoire.ecriture(31, addresseCouleur);
+		memoire.ecriture(32, couleur);
+		
 	}
 ////////////////////////////////////////////////////////////////////////
 bool antiRebond(){

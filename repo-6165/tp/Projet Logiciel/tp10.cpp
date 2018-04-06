@@ -71,8 +71,7 @@ int main() {
 	return 0;
 }
 	void envoieInfo(Memoire24CXXX memoire, uint8_t *tableau) {
-		unsigned char capteurGauche = 0;
-		unsigned char capteurDroit = 0;	
+
 		uint8_t info;
 		for (int i = 0; i < 39; i++){
 			
