@@ -30,7 +30,7 @@ int main() {
 	initialisationUART();
 	initialisationInt();
 	setUpPWMoteur();
-	partirMinuterie(90000000);	
+	partirMinuterie(195);	
 	
 	
 	//ecrireInfo(memoire);
@@ -151,23 +151,7 @@ uint8_t getBouton(){
 //main here
 //partirMinuterie(100000);
 //
-ISR ( TIMER2_COMPA_vect  ) {
-	//~ jouerNote(45);
-	//~ _delay_ms(200);
-	//~ arreterJouer();
-	DDRA = 0x00;
-	can  convertisseurD = can();
-	can  convertisseurG = can();
-	uint8_t lectureDonneeD = lecture8Bit(convertisseurD, 5);
-	uint8_t lectureDonneeG = lecture8Bit(convertisseurG, 4);
-	double interD = 2478.633156*(pow(lectureDonneeD,-1.125));
-	double interG = 2478.633156*(pow(lectureDonneeG,-1.125));
-	transmissionUART(0xf6);
-	transmissionUART(interD);
-	transmissionUART(0xf7);
-	transmissionUART(interG);
 
-}
 
 void partirMinuterie ( uint32_t duree ) {
 
@@ -194,6 +178,24 @@ TCCR2B |= (1 << CS20);
 //TCCR1C = 0;
 
 TIMSK2 |= (1 << OCIE2A);
+
+}
+
+ISR ( TIMER2_COMPA_vect  ) {
+	//~ jouerNote(45);
+	//~ _delay_ms(200);
+	//~ arreterJouer();
+	DDRA = 0x00;
+	can  convertisseurD = can();
+	can  convertisseurG = can();
+	uint8_t lectureDonneeD = lecture8Bit(convertisseurD, 5);
+	uint8_t lectureDonneeG = lecture8Bit(convertisseurG, 4);
+	double interD = 2478.633156*(pow(lectureDonneeD,-1.125));
+	double interG = 2478.633156*(pow(lectureDonneeG,-1.125));
+	transmissionUART(0xf6);
+	transmissionUART(interD);
+	transmissionUART(0xf7);
+	transmissionUART(interG);
 
 }
 ////////////////////////////////////////////////////////////////////////

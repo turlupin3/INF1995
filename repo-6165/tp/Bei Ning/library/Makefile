@@ -21,30 +21,21 @@
 # (exemple: 'at90s8515')
 MCU=atmega324pa
 
-# Nom de votre projet
-# (utilisez un seul mot, exemple: 'monprojet')
-PROJECTNAME=tp10
-
 # Fichiers sources
 # Utilisez le suffixe .cpp pour les fichiers C++
 # Listez tous les fichiers a compiler, separes par
 # un espace. exemple: 'tp1.c tp2.cpp':
-PRJSRC=capteurs.cpp
+PRJSRC=$(wildcard *.cpp)
 
 # Inclusions additionnels (ex: -I/path/to/mydir)
-INC= -I library
+INC=
 
 # Libraires a lier (ex: -lmylib)
-LIBS= library/library.a
+LIBS=
 
 # Niveau d'optimization
 # Utilisez s (size opt), 1, 2, 3 ou 0 (off)
 OPTLEVEL=s
-
-# Programmer ID - Ne pas changer 
-# Liste complete des IDs disponible avec avrdude
-AVRDUDE_PROGRAMMERID=usbasp
-
 
 
 ####################################################
@@ -87,17 +78,6 @@ CXXFLAGS=-fno-exceptions
 # Linker pour lier les librairies utilisees
 LDFLAGS=-Wl,-Map,$(TRG).map -mmcu=$(MCU)
 
-
-
-####### Cible (Target) #######
-
-#Nom des cibles par defaut
-TRG=$(PROJECTNAME).out
-HEXROMTRG=$(PROJECTNAME).hex
-HEXTRG=$(HEXROMTRG) $(PROJECTNAME).ee.hex
-
-
-
 ####### Definition de tout les fichiers objets #######
 
 # Cette fonction permet de differencier les fichiers .c
@@ -128,12 +108,7 @@ OBJDEPS=$(CFILES:.c=.o) \
 
 # Make all permet simplement de compiler le projet
 #
-all: $(TRG)
-
-# Implementation de la cible
-$(TRG): $(OBJDEPS)
-	$(CC) $(LDFLAGS) -o $(TRG) $(OBJDEPS) \
-	-lm $(LIBS)
+all: library.a
 
 # Production des fichiers object
 # De C a objet
@@ -149,22 +124,15 @@ $(TRG): $(OBJDEPS)
 # Pour plus d'information sur cette section, consulter:
 # http://bit.ly/2580FU8
 
-# Production des fichiers hex a partir des fichiers elf
-%.hex: %.out
-	$(OBJCOPY) -j .text -j .data \
-		-O $(HEXFORMAT) $< $@
+#creation de l'archivre
+library.a: $(OBJDEPS)
+	avr-ar -rcs library.a $(OBJDEPS)
 
-# Make install permet de compiler le projet puis
-# d'ecrire le programme en memoire flash dans votre
-# microcontroleur. Celui-ci doit etre branche par cable USB
-install: $(HEXROMTRG)				
-	$(AVRDUDE) -c $(AVRDUDE_PROGRAMMERID)   \
-	-p $(MCU) -P -e -U flash:w:$(HEXROMTRG)
 
 # Make clean permet d'effacer tout les fichiers generes
 # lors de la compilation
 clean:
-	$(REMOVE) $(TRG) $(TRG).map $(OBJDEPS) $(HEXTRG) *.d
+	$(REMOVE) $(TRG) $(TRG).map $(OBJDEPS) $(HEXTRG) *.d $(TRG).out.map
 
 # Pour plus d'information sur les phony target, consulter:
 # http://bit.ly/1WBQe61
