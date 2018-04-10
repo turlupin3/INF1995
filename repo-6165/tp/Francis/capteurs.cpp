@@ -79,7 +79,7 @@ ISR (TIMER2_COMPA_vect){
 
 }
 
-ISR(TIMER2_COMPB_vec){
+ISR(TIMER2_COMPB_vect){
 	can  convertisseurG = can();
 	uint8_t lectureDonneeG = lecture8Bit(convertisseurG, 4);
 	distanceG = 2478.633156*(pow(lectureDonneeG, -1.125));
