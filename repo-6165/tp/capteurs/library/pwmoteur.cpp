@@ -55,8 +55,9 @@ void controleMoteur(int8_t op) {
 	}
 	
 	uint8_t tmp = op *2.55;
+	double temp = tmp*0.80;
 	OCR0B = tmp;
-	OCR0A = tmp;
+	OCR0A = temp;
 	
 }
 
