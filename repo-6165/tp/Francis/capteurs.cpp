@@ -12,19 +12,34 @@
 void initialisation();
 void initializeSensor();
 uint8_t lecture8Bit(can& conv, uint8_t pos);
+void wallFollow();
 
-volatile uint8_t distanceD;
-volatile uint8_t distanceG;
+volatile const float ECARTENTREMESURES = 0.03264;
+volatile float tauxVariationD = 0;
+volatile float tauxVariationG = 0;
+volatile uint8_t pointeurMesureD = 0;
+volatile uint8_t pointeurMesureG = 0;
+uint8_t mesuresD[120];
+uint8_t mesuresG[120];
 
 int main(){
 	initialisationUART();
 	initialisation();
 	initializeSensor();
 	
-	while(true){}
+	while(true){
+	
+		transmissionUART(tauxVariationD);
+	
+	}
 	
 	return 0; 
 }
+
+void wallFollow() {
+
+}
+
 uint8_t lecture8Bit(can& conv, uint8_t pos){
     return conv.lecture(pos) >> 2;
 }
@@ -49,10 +64,6 @@ ISR(INT0_vect){
 
 void initializeSensor() {
     cli();
-	PORTC = 1;
-	_delay_ms(500);
-	PORTC = 0;
-	_delay_ms(500);
 
     TCNT2 = 0;
     OCR2A = 127;
@@ -78,20 +89,45 @@ void initializeSensor() {
 }
 
 ISR (TIMER2_COMPA_vect){
-	PORTC = 1;
+	
 	can  convertisseurD = can();
+	
 	uint8_t lectureDonneeD = lecture8Bit(convertisseurD, 4);
-	distanceD = 2478.633156*(pow(lectureDonneeD,-1.125));
+	uint8_t distanceD = 2478.633156*(pow(lectureDonneeD,-1.125));
+	
 	transmissionUART(0xf6);
 	transmissionUART(distanceD);
+	
+	tauxVariationD = (float)(distanceD - mesuresD[pointeurMesureD]) / ECARTENTREMESURES;
 
+	if(pointeurMesureD != 120){
+		pointeurMesureD++;
+	}
+	else {
+		pointeurMesureD = 0;
+	}
 
+	mesuresD[pointeurMesureD] = distanceD;
 }
 
 ISR(TIMER2_COMPB_vect){
+	
 	can  convertisseurG = can();
-	uint8_t lectureDonneeG = lecture8Bit(convertisseurG, 5);
-	distanceG = 2478.633156*(pow(lectureDonneeG, -1.125));
-	transmissionUART(0xf7);
+
+	uint8_t lectureGonneeG = lecture8Bit(convertisseurG, 4);
+	uint8_t distanceG = 2478.633156*(pow(lectureGonneeG, -1.125));
+
+	transmissionUART(0xf6);
 	transmissionUART(distanceG);
+
+	tauxVariationG = (float)(distanceG - mesuresG[pointeurMesureG]) / ECARTENTREMESURES;
+
+	if (pointeurMesureG != 120) {
+		pointeurMesureG++;
+	}
+	else {
+		pointeurMesureG = 0;
+	}
+
+	mesuresG[pointeurMesureG] = distanceG;
 }
