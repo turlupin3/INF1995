@@ -10,13 +10,18 @@
 #include <can.h>
 
 void initialisation();
-void startTimer ( uint8_t duree );
+void initializeSensor();
 uint8_t lecture8Bit(can& conv, uint8_t pos);
 
 volatile uint8_t distanceD;
 volatile uint8_t distanceG;
 
 int main(){
+	initialisationUART();
+	initialisation();
+	initializeSensor();
+	
+	while(true){}
 	
 	return 0; 
 }
@@ -44,7 +49,10 @@ ISR(INT0_vect){
 
 void initializeSensor() {
     cli();
-
+	PORTC = 1;
+	_delay_ms(500);
+	PORTC = 0;
+	_delay_ms(500);
 
     TCNT2 = 0;
     OCR2A = 127;
@@ -70,8 +78,9 @@ void initializeSensor() {
 }
 
 ISR (TIMER2_COMPA_vect){
+	PORTC = 1;
 	can  convertisseurD = can();
-	uint8_t lectureDonneeD = lecture8Bit(convertisseurD, 5);
+	uint8_t lectureDonneeD = lecture8Bit(convertisseurD, 4);
 	distanceD = 2478.633156*(pow(lectureDonneeD,-1.125));
 	transmissionUART(0xf6);
 	transmissionUART(distanceD);
@@ -81,7 +90,7 @@ ISR (TIMER2_COMPA_vect){
 
 ISR(TIMER2_COMPB_vect){
 	can  convertisseurG = can();
-	uint8_t lectureDonneeG = lecture8Bit(convertisseurG, 4);
+	uint8_t lectureDonneeG = lecture8Bit(convertisseurG, 5);
 	distanceG = 2478.633156*(pow(lectureDonneeG, -1.125));
 	transmissionUART(0xf7);
 	transmissionUART(distanceG);
