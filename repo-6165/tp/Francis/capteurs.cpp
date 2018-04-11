@@ -1,5 +1,6 @@
 #define F_CPU 8000000
 
+#include <stdlib.h>
 #include <ini.h>
 #include <memoire_24.h>
 #include <UART.h>
@@ -27,15 +28,47 @@ int main(){
 	initialisationUART();
 	initialisation();
 	initializeSensor();
+	setUpPWMoteur();
+	
 	
 	while(true){
-	
+		
+		wallFollow();
+		PORTC=1;
+
+
 	}
 	
 	return 0; 
 }
 
 void wallFollow() {
+
+	controleMoteurG(75);
+	controleMoteurD(55);
+	
+	while(mesuresD[pointeurMesureD] < 12 || mesuresD[pointeurMesureD] > 17 ){
+		PORTC=2;
+		if(tauxVariationD > 0){
+
+			int8_t tmp = 75 + abs(15-mesuresD[pointeurMesureD]);
+			if(tmp > 100){
+				tmp = 100;
+			}
+			controleMoteurG(tmp);
+			
+		}
+		else if(tauxVariationD < 0){
+		
+			int8_t tmp = 75 + abs(15-mesuresD[pointeurMesureD]);
+			if(tmp > 100){
+				tmp = 100;
+			}
+			controleMoteurD(tmp);
+		}
+	}
+	controleMoteurG(75);
+	controleMoteurD(55);
 
 }
 
@@ -116,8 +149,8 @@ ISR (TIMER2_COMPA_vect){
 	uint8_t lectureDonneeD = lecture8Bit(convertisseurD, 4);
 	//uint8_t distanceD = uint8_t(964.2271747/((float)(lectureDonneeD)-28.6141603));
 	uint8_t distanceD = calculDistance(lectureDonneeD);
-	//transmissionUART(0xf6);
-	transmissionUART(lectureDonneeD);
+	//~ transmissionUART(0xf7);
+	transmissionUART(distanceD);
 	tauxVariationD = (float)(distanceD - mesuresD[pointeurMesureD]) / ECARTENTREMESURES;
 
 	if(pointeurMesureD != 120){
@@ -135,10 +168,11 @@ ISR(TIMER2_COMPB_vect){
 	can  convertisseurG = can();
 
 	uint8_t lectureDonneeG = lecture8Bit(convertisseurG, 5);
-	uint8_t distanceG = 2478.633156*(pow(lectureDonneeG, -1.125));
+	//uint8_t distanceG = 2478.633156*(pow(lectureDonneeG, -1.125));
+	uint8_t distanceG = calculDistance(lectureDonneeG);
 
-	//transmissionUART(0xf7);
-	//transmissionUART(distanceG);
+	//~ transmissionUART(0xf6);
+	//~ transmissionUART(distanceG);
 
 	tauxVariationG = (float)(distanceG - mesuresG[pointeurMesureG]) / ECARTENTREMESURES;
 
