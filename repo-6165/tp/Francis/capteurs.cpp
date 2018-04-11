@@ -49,16 +49,16 @@ uint8_t calculDistance(uint8_t &donnee) {
 		return 10;
 	}
 	else if (donnee > 92) {
-		return (uint8_t)(-0.13 * (float)(donnee)+26.86);
+		return (uint8_t)(-0.13 * (float)(donnee)+27.11);
 	}
 	else if (donnee > 61) {
-		return (uint8_t)(-0.32 * (float)(donnee)+44.9);
+		return (uint8_t)(-0.32 * (float)(donnee)+44.68);
 	}
 	else if (donnee > 53) {
-		return (uint8_t)(-1.19 * (float)(donnee)+97.94);
+		return (uint8_t)(-1.25 * (float)(donnee)+101.25);
 	}
-	else if (donnee > 44) {
-		return (uint8_t)(-4.89 * (float)(donnee)+293.43);
+	else if (donnee > 48) {
+		return (uint8_t)(-5 * (float)(donnee)+300);
 	}
 	else {
 		return 65;
@@ -117,7 +117,7 @@ ISR (TIMER2_COMPA_vect){
 	//uint8_t distanceD = uint8_t(964.2271747/((float)(lectureDonneeD)-28.6141603));
 	uint8_t distanceD = calculDistance(lectureDonneeD);
 	//transmissionUART(0xf6);
-	transmissionUART(distanceD);
+	transmissionUART(lectureDonneeD);
 	tauxVariationD = (float)(distanceD - mesuresD[pointeurMesureD]) / ECARTENTREMESURES;
 
 	if(pointeurMesureD != 120){
