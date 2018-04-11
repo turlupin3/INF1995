@@ -12,6 +12,7 @@
 void initialisation();
 void initializeSensor();
 uint8_t lecture8Bit(can& conv, uint8_t pos);
+uint8_t calculDistance(uint8_t &donnee);
 void wallFollow();
 
 volatile const float ECARTENTREMESURES = 0.03264;
@@ -40,6 +41,28 @@ void wallFollow() {
 
 uint8_t lecture8Bit(can& conv, uint8_t pos){
     return conv.lecture(pos) >> 2;
+}
+
+uint8_t calculDistance(uint8_t &donnee) {
+
+	if (donnee > 130) {
+		return 10;
+	}
+	else if (donnee > 92) {
+		return (uint8_t)(-0.13 * (float)(donnee)+26.86);
+	}
+	else if (donnee > 61) {
+		return (uint8_t)(-0.32 * (float)(donnee)+44.9);
+	}
+	else if (donnee > 53) {
+		return (uint8_t)(-1.19 * (float)(donnee)+97.94);
+	}
+	else if (donnee > 44) {
+		return (uint8_t)(-4.89 * (float)(donnee)+293.43);
+	}
+	else {
+		return 65;
+	}
 }
 
 void initialisation(){
@@ -91,12 +114,10 @@ ISR (TIMER2_COMPA_vect){
 	can  convertisseurD = can();
 	
 	uint8_t lectureDonneeD = lecture8Bit(convertisseurD, 4);
-	uint8_t distanceD = uint8_t(964.2271747/((float)(lectureDonneeD)-28.6141603));
-	uint8_t distanceG = 2478.633156*(pow(lectureDonneeD, -1.125));
-	
+	//uint8_t distanceD = uint8_t(964.2271747/((float)(lectureDonneeD)-28.6141603));
+	uint8_t distanceD = calculDistance(lectureDonneeD);
 	//transmissionUART(0xf6);
 	transmissionUART(distanceD);
-	//transmissionUART(lectureDonneeD);
 	tauxVariationD = (float)(distanceD - mesuresD[pointeurMesureD]) / ECARTENTREMESURES;
 
 	if(pointeurMesureD != 120){
