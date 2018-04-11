@@ -29,8 +29,6 @@ int main(){
 	
 	while(true){
 	
-		transmissionUART(tauxVariationD);
-	
 	}
 	
 	return 0; 
@@ -93,11 +91,12 @@ ISR (TIMER2_COMPA_vect){
 	can  convertisseurD = can();
 	
 	uint8_t lectureDonneeD = lecture8Bit(convertisseurD, 4);
-	uint8_t distanceD = 2478.633156*(pow(lectureDonneeD,-1.125));
+	uint8_t distanceD = uint8_t(964.2271747/((float)(lectureDonneeD)-28.6141603));
+	uint8_t distanceG = 2478.633156*(pow(lectureDonneeD, -1.125));
 	
-	transmissionUART(0xf6);
+	//transmissionUART(0xf6);
 	transmissionUART(distanceD);
-	
+	//transmissionUART(lectureDonneeD);
 	tauxVariationD = (float)(distanceD - mesuresD[pointeurMesureD]) / ECARTENTREMESURES;
 
 	if(pointeurMesureD != 120){
@@ -114,11 +113,11 @@ ISR(TIMER2_COMPB_vect){
 	
 	can  convertisseurG = can();
 
-	uint8_t lectureGonneeG = lecture8Bit(convertisseurG, 4);
-	uint8_t distanceG = 2478.633156*(pow(lectureGonneeG, -1.125));
+	uint8_t lectureDonneeG = lecture8Bit(convertisseurG, 5);
+	uint8_t distanceG = 2478.633156*(pow(lectureDonneeG, -1.125));
 
-	transmissionUART(0xf6);
-	transmissionUART(distanceG);
+	//transmissionUART(0xf7);
+	//transmissionUART(distanceG);
 
 	tauxVariationG = (float)(distanceG - mesuresG[pointeurMesureG]) / ECARTENTREMESURES;
 
