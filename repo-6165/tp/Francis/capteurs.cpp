@@ -69,7 +69,7 @@ void wallFollow() {
 	
 	while(mesuresD[pointeurMesureD] < 12){
 		PORTC=2;
-		controleMoteurD(pidD(1, 0, 0));
+		controleMoteurD(pidD(0.5, 0, 0));
 		}
 	while(mesuresD[pointeurMesureD] > 17){
 		controleMoteurG(pidD(1, 0, 0));
