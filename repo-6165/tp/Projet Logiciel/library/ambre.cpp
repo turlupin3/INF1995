@@ -2,19 +2,24 @@
 #include <ambre.h>
 
 void ambre(){
-	PORTA = VERTDEL;
+	delOff();
+	PORTD |= VERTDEL;
 	_delay_ms(1.0);
-	PORTA = ROUGEDEL;
+	delOff();
+	PORTD |= ROUGEDEL;
 	_delay_ms(1.0);
 }
 void delVert(){
-	PORTA = VERTDEL;
+	delOff();
+	PORTD |= VERTDEL;
 }
 void delRouge(){
-	PORTA = ROUGEDEL;
+	delOff();
+	PORTD |= ROUGEDEL;
 }
 void delOff(){
-	PORTA = 0;
+	PORTD &= ~(1<<5);
+	PORTD &= ~(1<<7);
 }
 void delSwitcher(unsigned char order){
 	switch (order) {

@@ -6,15 +6,17 @@
 #include <manips.h>
 #include <ambre.h>
 #include <can.h>
+#include <avr/interrupt.h>
 
-void envoieInfo(Memoire24CXXX memoire);
-void ecrireInfo(Memoire24CXXX memoire);
-ISR(INT0_vect);
+void envoieInfo(Memoire24CXXX &memoire);
+void ecrireInfo(Memoire24CXXX &memoire);
+
 bool antiRebond();
 void initialisationInt();
 uint8_t getBouton();
 
 void partirMinuterie ( uint32_t duree );
+
 
 //capteur
 uint8_t lecture8Bit(can& conv, uint8_t pos);
@@ -25,18 +27,21 @@ volatile bool boole = 0x01;
 //volatile can  convertisseurD = can();
 //
 int main() {
-	demarrage();
+	DDRD = 0xf0;
+	//demarrage();
 	Memoire24CXXX memoire = Memoire24CXXX();
 	initialisationUART();
-	initialisationInt();
+	initialisationInt();	
 	setUpPWMoteur();
-	partirMinuterie(195);	
-	
+	jouerNote(55);	
+	_delay_ms(200);
+	arreterJouer();
+
 	
 	//ecrireInfo(memoire);
 	_delay_ms(10);
 	envoieInfo(memoire);
-	
+	partirMinuterie(195); ///MAKE A SECONDE UART ELSE INT BUTTON IS NOT CLEAN///	
 	struct operation{
 		unsigned char instruction; 
 		int8_t operande;
@@ -49,13 +54,19 @@ for(;;){
 		
 		switch (op.instruction) {
 			case 0xf8: //vitesse de roue gauche
+
 				controleMoteurG(op.operande);
+
 				break;
 			case 0xf9: //vitesse de rouge droite
+
 				controleMoteurD(op.operande);
+
 				break;
 			case 0xfa: // couleur de la del libre
+				
 				delSwitcher(op.operande);
+
 				break;
 			case 0xfb: // requete denvoi des information didentification
 				//envoieInfo(memoire);
@@ -69,7 +80,7 @@ for(;;){
 	
 	return 0;
 }
-	void envoieInfo(Memoire24CXXX memoire) {
+	void envoieInfo(Memoire24CXXX &memoire) {
 		uint8_t bit;
 		for (int i = 0; i < 33; i++){
 			memoire.lecture(i, &bit);
@@ -78,7 +89,7 @@ for(;;){
 		
 	}
 
-	void ecrireInfo(Memoire24CXXX memoire){
+	void ecrireInfo(Memoire24CXXX &memoire){
 	
 		uint8_t addresseNomRobot = 0xf0;
 		uint8_t addresseNumeroEquipe = 0xf1;
@@ -106,7 +117,6 @@ for(;;){
 	}
 ////////////////////////////////////////////////////////////////////////
 bool antiRebond(){
-	DDRD = 0x00;
 	bool estEnfonce = false;
 	if(PIND & 0x04){
 		_delay_ms(10.0);
@@ -120,17 +130,16 @@ bool antiRebond(){
 
 void initialisationInt(){
 	cli();
-	DDRA = 0xff;
-	DDRD = 0x00;
-	
-	
+	//DDRA = 0xff;
+	//DDRD = 0x00;
 	EIMSK |= (1 << INT0);
-	EICRA |= (0 << ISC01) | (1 << ISC00); // set external interupt on pin INT0 with option any logical change generate an interupt request
-
+	EICRA |= (1 << ISC00); // set external interupt on pin INT0 with option any logical change generate an interupt request
+	
 	sei();
 }
 
 ISR(INT0_vect){
+	cli();
 	//rising and failling edge
 	_delay_ms(25);
 	boole = !boole;
@@ -138,6 +147,7 @@ ISR(INT0_vect){
 	transmissionUART(boole);
 		
 	EIFR |= (1 << INTF0);
+	sei();
 }
 
 uint8_t getBouton(){
