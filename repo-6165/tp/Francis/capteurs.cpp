@@ -19,8 +19,8 @@ int8_t pidD(float kp, float ki,float  kd);
 
 volatile const float ECARTENTREMESURES = 0.03264;
 volatile const uint8_t DISTANCEVOULUE = 15;
-volatile erreurD = 0;
-volatile erreurG = 0;
+volatile uint8_t erreurD = 0;
+volatile uint8_t erreurG = 0;
 volatile float tauxVariationD = 0;
 volatile float tauxVariationG = 0;
 volatile float integraleD = 0;
@@ -55,10 +55,10 @@ int8_t pidD(float kp, float ki, float kd) {
 		return 100;
 	}
 	else if (retour < 0) {
-		retun 0
+		return 0;
 	}
 	else {
-		return retour
+		return retour;
 	}
 }
 
@@ -69,10 +69,10 @@ void wallFollow() {
 	
 	while(mesuresD[pointeurMesureD] < 12){
 		PORTC=2;
-		controleMoteurD(pidD(1, 0, 0);
+		controleMoteurD(pidD(1, 0, 0));
 		}
 	while(mesuresD[pointeurMesureD] > 17){
-		controleMoteurG(pidD(1, 0, 0);
+		controleMoteurG(pidD(1, 0, 0));
 	}
 	controleMoteurG(75);
 	controleMoteurD(55);
@@ -184,7 +184,7 @@ ISR(TIMER2_COMPB_vect){
 	//~ transmissionUART(0xf6);
 	//~ transmissionUART(distanceG);
 
-	erreurG = (distancG - DISTANCEVOULUE);
+	erreurG = (distanceG - DISTANCEVOULUE);
 	tauxVariationG = (float)(erreurG) / ECARTENTREMESURES;
 	integraleG += (float)(erreurG)* ECARTENTREMESURES;
 
