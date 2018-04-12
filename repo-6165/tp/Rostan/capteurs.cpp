@@ -12,6 +12,7 @@
 
 #define F_CPU 8000000
 
+#include <stdlib.h>
 #include <ini.h>
 #include <memoire_24.h>
 #include <UART.h>
@@ -58,8 +59,7 @@ int main(){
 	initialisation();
 	setUpPWMoteur();
 	partirMinuterie(100);
-	
-	//_delay_ms(1000);
+
 	if (capteurD == proche || capteurD == ok){ // permet de savoir quel cote on longe
 		longerDroite = true;				   // au debut du parcours
 		longerGauche = false;
@@ -68,71 +68,79 @@ int main(){
 		longerDroite = false;
 		longerGauche = true;
 	}
-	controleMoteur(75);
+	controleMoteurG(0);
+	controleMoteurD(0);
 	
 	while(true){
-		
-		//lectureCapteurs();
-		
-		if (longerDroite == true){ 		// switch case lorsqu'on longe la droite
-			switch(capteurD){
-				case proche:
-					if(capteurG == loin)
-						droitChanger = true;
-					if (capteurG == ok && droitChanger == true)
-						changerPanneau();
-					if(lectureDonneeD > 94) // si distance < 15cm
-						ajustementDroite(); 
-					break;
-					
-				case ok:
-					if(capteurG == loin)
-						droitChanger = true;
-					if (capteurG == ok && droitChanger == true)
-						changerPanneau();
-					if (lectureDonneeD < 94) // si distance > 15cm
-						ajustementDroite();
-					break;
-						
-				case loin:
-					if (capteurG == loin){
-						droitChanger = true;
-						faireLeTourDroite();
-					}
-					break;
-			}
-		}
-		
-		
-		if (longerGauche == true){		// switch case lorsqu'on longe la gauche
-			switch(capteurG){
-				case proche:
-					if(capteurD == loin)
-						droitChanger = true;
-					if (capteurD == ok && droitChanger == true)
-						changerPanneau();
-					if(lectureDonneeG > 94) // si distance < 15cm
-						ajustementGauche();
-					break;
-					
-				case ok:
-					if (capteurD == loin)
-						droitChanger = true;
-					if (capteurD == ok && droitChanger == true)
-						changerPanneau();
-					if (lectureDonneeG < 94) // si distance > 15cm
-						ajustementGauche();
-					break;
-						
-				case loin:
-					if (capteurD == loin){
-						droitChanger = true;
-						faireLeTourGauche();
-					}
-					break;
-			}
-		}
+		ajustementDroite();
 	}
+	//~ while(true){
+			//~ OCR0A = 0;
+			//~ _delay_ms(1000);
+		 //~ ajustementDroite();
+		 //ajustementGauche();
+		//~ }
+		//~ //lectureCapteurs();
+		
+		//~ if (longerDroite == true){ 		// switch case lorsqu'on longe la droite
+			//~ switch(capteurD){
+				//~ case proche:
+					//~ if(capteurG == loin)
+						//~ droitChanger = true;
+					//~ if (capteurG == ok && droitChanger == true)
+						//~ changerPanneau();
+					//~ if(lectureDonneeD > 94) // si distance < 15cm
+						//~ ajustementDroite(); 
+					//~ break;
+					
+				//~ case ok:
+					//~ if(capteurG == loin)
+						//~ droitChanger = true;
+					//~ if (capteurG == ok && droitChanger == true)
+						//~ changerPanneau();
+					//~ if (lectureDonneeD < 94) // si distance > 15cm
+						//~ ajustementDroite();
+					//~ break;
+						
+				//~ case loin:
+					//~ if (capteurG == loin){
+						//~ droitChanger = true;
+						//~ faireLeTourDroite();
+					//~ }
+					//~ break;
+			//~ }
+		//~ }
+		
+		
+		//~ if (longerGauche == true){		// switch case lorsqu'on longe la gauche
+			//~ switch(capteurG){
+				//~ case proche:
+					//~ if(capteurD == loin)
+						//~ droitChanger = true;
+					//~ if (capteurD == ok && droitChanger == true)
+						//~ changerPanneau();
+					//~ if(lectureDonneeG > 94) // si distance < 15cm
+						//~ ajustementGauche();
+					//~ break;
+					
+				//~ case ok:
+					//~ if (capteurD == loin)
+						//~ droitChanger = true;
+					//~ if (capteurD == ok && droitChanger == true)
+						//~ changerPanneau();
+					//~ if (lectureDonneeG < 94) // si distance > 15cm
+						//~ ajustementGauche();
+					//~ break;
+						
+				//~ case loin:
+					//~ if (capteurD == loin){
+						//~ droitChanger = true;
+						//~ faireLeTourGauche();
+					//~ }
+					//~ break;
+			//~ }
+		//~ }
+	 //~ }
 	
 	return 0; 
 }
@@ -173,16 +181,19 @@ void ajustementDroite(){
 	// si le robot se dirige vers le panneau on fait tourner la roue droite
 	// plus vite.
 	PORTC = ROUGE;
-	if (lectureDonneeD > 94){	// si distance < 15cm
-		if (OCR0A + 50 > 255) // 50 est arbitraire
-			OCR0A = 255;
-		else
-			OCR0A += 50;
-			
-		while(lectureDonneeD < 90 && lectureDonneeD > 98){	// si distance != 15cm
+	if (distanceD < 15){	// si distance < 15cm
+		//~ if (OCR0A + 100 > 255){ // 50 est arbitraire
+			//~ OCR0A = 255;
+		//~ }
+		//~ else{
+			//~ OCR0A += 100;
+		//~ }
+		controleMoteurD(40);
+		while(distanceD < 13 || distanceD > 17){	// si distance != 15cm
 			//lectureCapteurs();
 		}
-		OCR0A = OCR0B;
+		controleMoteurG(43);
+		controleMoteurD(30);
 		//~ if (OCR0B + 50 > 255){
 			//~ OCR0B = 255;
 			//~ _delay_ms(200); // 200 est arbitraire
@@ -197,16 +208,19 @@ void ajustementDroite(){
 	
 	// si le robot s'eloigne du panneau on fait tourner la roue gauche
 	// plus vite.
-	if (lectureDonneeD < 94){ // si distance > 15cm
-		if (OCR0B + 50 > 255) // 50 est arbitraire
-			OCR0B = 255;
-		else
-			OCR0B += 50;
-			
-		while(lectureDonneeD < 90 && lectureDonneeD > 98){ // si distance != 15cm
+	if (distanceD > 15 && distanceD < 23){ // si distance > 15cm
+		//~ if (OCR0B + 50 > 255){ // 50 est arbitraire
+			//~ OCR0B = 255;
+		//~ }
+		//~ else{
+			//~ OCR0B += 50;
+		//~ }	
+		controleMoteurG(50);	
+		while(distanceD < 13 || distanceD > 17){ // si distance != 15cm
 			//lectureCapteurs();
 		}
-		OCR0B = OCR0A;
+		controleMoteurG(43);
+		controleMoteurD(30);
 		//~ if (OCR0A + 50 > 255){
 			//~ OCR0A = 255;
 			//~ _delay_ms(200); // 200 est arbitraire
@@ -217,6 +231,9 @@ void ajustementDroite(){
 			//~ _delay_ms(200);
 			//~ OCR0A = OCR0B;
 		//~ }
+	else if (distanceD > 23) {
+		controleMoteurD(50);
+		_delay_ms(1000);
 	}
 	PORTC = VERT;
 }
@@ -227,12 +244,12 @@ void ajustementGauche(){
 	// plus vite.
 	PORTC = ROUGE;
 	if (lectureDonneeG > 94){ // si distance < 15cm
-		if (OCR0B + 50 > 255) // 50 est arbitraire
+		if (OCR0B + 50 > 255) // 25 est arbitraire
 			OCR0B = 255;
 		else
 			OCR0B += 50;
 			
-		while(lectureDonneeG < 90 && lectureDonneeG > 98){	// si distance != 15cm
+		while(lectureDonneeG != 94){	// si distance != 15cm
 			//lectureCapteurs();
 		}
 		OCR0B = OCR0A;
@@ -251,12 +268,12 @@ void ajustementGauche(){
 	// si le robot s'eloigne du panneau on fait tourner la roue droite
 	// plus vite.
 	if (lectureDonneeG < 94){ // si distance > 18cm
-		if (OCR0A + 50 > 255) // 50 est arbitraire
+		if (OCR0A + 50 > 255) // 25 est arbitraire
 			OCR0A = 255;
 		else
 			OCR0A += 50;
 			
-		while(lectureDonneeG < 90 && lectureDonneeG > 98){	// si distance != 15cm
+		while(lectureDonneeG != 94){	// si distance != 15cm
 			//lectureCapteurs();
 		}
 		OCR0A = OCR0B;
@@ -445,36 +462,101 @@ sei();
 
 ISR ( TIMER2_COMPA_vect  ) {
 
-	DDRC= 0xff;
-	PORTC= 2;
-	DDRA = 0x00;
-	can  convertisseurD = can();
-	can  convertisseurG = can();
-	lectureCapteurs();
-	//~ lectureDonneeD = lecture8Bit(convertisseurD, 5);
-	//~ lectureDonneeG = lecture8Bit(convertisseurG, 4);
+	//~ DDRC= 0xff;
+	//~ PORTC= 2;
+	//~ DDRA = 0x00;
+	//~ can  convertisseurD = can();
+	//~ can  convertisseurG = can();
+	//~ lectureCapteurs();
+	lectureDonneeD = lecture8Bit(convertisseurD, 4);
+	//~ lectureDonneeG = lecture8Bit(convertisseurG, 5);
 	distanceD = 2478.633156*(pow(lectureDonneeD,-1.125));
-	distanceG = 2478.633156*(pow(lectureDonneeG,-1.125));
+	if (distanceD < 15){ // si distance < 15cm
+		capteurD = proche;
+	}
+	else if (distanceD > 60){ // si distance > 60cm
+		capteurD = loin;
+	}
+	
+	else{
+		capteurD = ok;			// 15<= distance >= 60cm
+	}
+	//~ distanceG = 2478.633156*(pow(lectureDonneeG,-1.125));
 	transmissionUART(0xf6);
 	transmissionUART(distanceD);
-	transmissionUART(0xf7);
-	transmissionUART(distanceG);
+	//~ transmissionUART(0xf7);
+	//~ transmissionUART(distanceG);
 
 }
-//~ ISR ( TIMER2_COMPA_vect  ) {
+ISR ( TIMER2_COMPB_vect  ) {
 	//~ jouerNote(45);
 	//~ _delay_ms(200);
 	//~ arreterJouer();
 	//~ DDRA = 0x00;
 	//~ can  convertisseurD = can();
 	//~ can  convertisseurG = can();
-	//~ uint8_t lectureDonneeD = lecture8Bit(convertisseurD, 5);
-	//~ uint8_t lectureDonneeG = lecture8Bit(convertisseurG, 4);
+	//~ lectureCapteurs();
+	//~ uint8_t lectureDonneeD = lecture8Bit(convertisseurD, 4);
+	uint8_t lectureDonneeG = lecture8Bit(convertisseurG, 5);
 	//~ double interD = 2478.633156*(pow(lectureDonneeD,-1.125));
-	//~ double interG = 2478.633156*(pow(lectureDonneeG,-1.125));
+	double distanceG = 2478.633156*(pow(lectureDonneeG,-1.125));
+	if (distanceG < 15){ // si distance < 15cm
+		capteurG = proche;
+	}
+	else if (distanceG > 60){ // si distance > 60cm
+		capteurG = loin;
+	}
+	
+	else{
+		capteurG = ok;			// 15<= distance >= 60cm
+	}
 	//~ transmissionUART(0xf6);
 	//~ transmissionUART(interD);
-	//~ transmissionUART(0xf7);
-	//~ transmissionUART(interG);
+	transmissionUART(0xf7);
+	transmissionUART(distanceG);
 
+}
+
+//~ ISR (TIMER2_COMPA_vect){
+	
+	//~ can  convertisseurD = can();
+	
+	//~ uint8_t lectureDonneeD = lecture8Bit(convertisseurD, 4);
+	//~ //uint8_t distanceD = uint8_t(964.2271747/((float)(lectureDonneeD)-28.6141603));
+	//~ uint8_t distanceD = calculDistance(lectureDonneeD);
+	//~ transmissionUART(0xf7);
+	//~ transmissionUART(distanceD);
+	//~ tauxVariationD = (float)(distanceD - mesuresD[pointeurMesureD]) / ECARTENTREMESURES;
+
+	//~ if(pointeurMesureD != 120){
+		//~ pointeurMesureD++;
+	//~ }
+	//~ else {
+		//~ pointeurMesureD = 0;
+	//~ }
+
+	//~ mesuresD[pointeurMesureD] = distanceD;
+//~ }
+
+//~ ISR(TIMER2_COMPB_vect){
+	
+	//~ can  convertisseurG = can();
+
+	//~ uint8_t lectureDonneeG = lecture8Bit(convertisseurG, 5);
+	//~ //uint8_t distanceG = 2478.633156*(pow(lectureDonneeG, -1.125));
+	//~ uint8_t distanceG = calculDistance(lectureDonneeG);
+
+	//~ transmissionUART(0xf6);
+	//~ transmissionUART(distanceG);
+
+	//~ tauxVariationG = (float)(distanceG - mesuresG[pointeurMesureG]) / ECARTENTREMESURES;
+
+	//~ if (pointeurMesureG != 120) {
+		//~ pointeurMesureG++;
+	//~ }
+	//~ else {
+		//~ pointeurMesureG = 0;
+	//~ }
+
+	//~ mesuresG[pointeurMesureG] = distanceG;
 //~ }

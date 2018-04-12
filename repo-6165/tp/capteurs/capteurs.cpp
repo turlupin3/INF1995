@@ -12,6 +12,7 @@
 
 #define F_CPU 8000000
 
+#include <stdlib.h>
 #include <ini.h>
 #include <memoire_24.h>
 #include <UART.h>
@@ -58,8 +59,7 @@ int main(){
 	initialisation();
 	setUpPWMoteur();
 	partirMinuterie(100);
-	
-	//_delay_ms(1000);
+
 	if (capteurD == proche || capteurD == ok){ // permet de savoir quel cote on longe
 		longerDroite = true;				   // au debut du parcours
 		longerGauche = false;
@@ -68,14 +68,16 @@ int main(){
 		longerDroite = false;
 		longerGauche = true;
 	}
-	controleMoteur(75);
-	_delay_ms(1000);
-	OCR0A =0;
-	_delay_ms(1000);
+	controleMoteurG(53);
+	controleMoteurD(40);
+	
+	//~ while(true){
+		//~ ajustementDroite();
+	//~ }
 	//~ while(true){
 			//~ OCR0A = 0;
 			//~ _delay_ms(1000);
-		 ajustementDroite();
+		 //~ ajustementDroite();
 		 //ajustementGauche();
 		//~ }
 		//~ //lectureCapteurs();
@@ -180,17 +182,18 @@ void ajustementDroite(){
 	// plus vite.
 	PORTC = ROUGE;
 	if (lectureDonneeD > 94){	// si distance < 15cm
-		if (OCR0A + 75 > 255){ // 50 est arbitraire
+		if (OCR0A + 50 > 255){ // 50 est arbitraire
 			OCR0A = 255;
 		}
 		else{
-			OCR0A += 75;
+			OCR0A += 50;
 		}
 		
 		while(lectureDonneeD != 94){	// si distance != 15cm
 			//lectureCapteurs();
 		}
-		OCR0A = OCR0B;
+		controleMoteurG(53);
+		controleMoteurD(40);
 		//~ if (OCR0B + 50 > 255){
 			//~ OCR0B = 255;
 			//~ _delay_ms(200); // 200 est arbitraire
@@ -206,17 +209,18 @@ void ajustementDroite(){
 	// si le robot s'eloigne du panneau on fait tourner la roue gauche
 	// plus vite.
 	if (lectureDonneeD < 94){ // si distance > 15cm
-		if (OCR0B + 75 > 255){ // 50 est arbitraire
+		if (OCR0B + 50 > 255){ // 50 est arbitraire
 			OCR0B = 255;
 		}
 		else{
-			OCR0B += 75;
+			OCR0B += 50;
 		}	
 			
 		while(lectureDonneeD != 94){ // si distance != 15cm
 			//lectureCapteurs();
 		}
-		OCR0B = OCR0A;
+		controleMoteurG(53);
+		controleMoteurD(40);
 		//~ if (OCR0A + 50 > 255){
 			//~ OCR0A = 255;
 			//~ _delay_ms(200); // 200 est arbitraire
@@ -455,36 +459,81 @@ sei();
 
 ISR ( TIMER2_COMPA_vect  ) {
 
-	DDRC= 0xff;
-	PORTC= 2;
-	DDRA = 0x00;
-	can  convertisseurD = can();
-	can  convertisseurG = can();
+	//~ DDRC= 0xff;
+	//~ PORTC= 2;
+	//~ DDRA = 0x00;
+	//~ can  convertisseurD = can();
+	//~ can  convertisseurG = can();
 	lectureCapteurs();
-	//~ lectureDonneeD = lecture8Bit(convertisseurD, 5);
-	//~ lectureDonneeG = lecture8Bit(convertisseurG, 4);
+	//~ lectureDonneeD = lecture8Bit(convertisseurD, 4);
+	//~ lectureDonneeG = lecture8Bit(convertisseurG, 5);
 	distanceD = 2478.633156*(pow(lectureDonneeD,-1.125));
-	distanceG = 2478.633156*(pow(lectureDonneeG,-1.125));
+	//~ distanceG = 2478.633156*(pow(lectureDonneeG,-1.125));
 	transmissionUART(0xf6);
 	transmissionUART(distanceD);
-	transmissionUART(0xf7);
-	transmissionUART(distanceG);
+	//~ transmissionUART(0xf7);
+	//~ transmissionUART(distanceG);
 
 }
-//~ ISR ( TIMER2_COMPA_vect  ) {
+ISR ( TIMER2_COMPB_vect  ) {
 	//~ jouerNote(45);
 	//~ _delay_ms(200);
 	//~ arreterJouer();
 	//~ DDRA = 0x00;
 	//~ can  convertisseurD = can();
 	//~ can  convertisseurG = can();
-	//~ uint8_t lectureDonneeD = lecture8Bit(convertisseurD, 5);
-	//~ uint8_t lectureDonneeG = lecture8Bit(convertisseurG, 4);
+	lectureCapteurs();
+	//~ uint8_t lectureDonneeD = lecture8Bit(convertisseurD, 4);
+	//~ uint8_t lectureDonneeG = lecture8Bit(convertisseurG, 5);
 	//~ double interD = 2478.633156*(pow(lectureDonneeD,-1.125));
-	//~ double interG = 2478.633156*(pow(lectureDonneeG,-1.125));
+	double distanceG = 2478.633156*(pow(lectureDonneeG,-1.125));
 	//~ transmissionUART(0xf6);
 	//~ transmissionUART(interD);
-	//~ transmissionUART(0xf7);
-	//~ transmissionUART(interG);
+	transmissionUART(0xf7);
+	transmissionUART(distanceG);
 
+}
+
+//~ ISR (TIMER2_COMPA_vect){
+	
+	//~ can  convertisseurD = can();
+	
+	//~ uint8_t lectureDonneeD = lecture8Bit(convertisseurD, 4);
+	//~ //uint8_t distanceD = uint8_t(964.2271747/((float)(lectureDonneeD)-28.6141603));
+	//~ uint8_t distanceD = calculDistance(lectureDonneeD);
+	//~ transmissionUART(0xf7);
+	//~ transmissionUART(distanceD);
+	//~ tauxVariationD = (float)(distanceD - mesuresD[pointeurMesureD]) / ECARTENTREMESURES;
+
+	//~ if(pointeurMesureD != 120){
+		//~ pointeurMesureD++;
+	//~ }
+	//~ else {
+		//~ pointeurMesureD = 0;
+	//~ }
+
+	//~ mesuresD[pointeurMesureD] = distanceD;
+//~ }
+
+//~ ISR(TIMER2_COMPB_vect){
+	
+	//~ can  convertisseurG = can();
+
+	//~ uint8_t lectureDonneeG = lecture8Bit(convertisseurG, 5);
+	//~ //uint8_t distanceG = 2478.633156*(pow(lectureDonneeG, -1.125));
+	//~ uint8_t distanceG = calculDistance(lectureDonneeG);
+
+	//~ transmissionUART(0xf6);
+	//~ transmissionUART(distanceG);
+
+	//~ tauxVariationG = (float)(distanceG - mesuresG[pointeurMesureG]) / ECARTENTREMESURES;
+
+	//~ if (pointeurMesureG != 120) {
+		//~ pointeurMesureG++;
+	//~ }
+	//~ else {
+		//~ pointeurMesureG = 0;
+	//~ }
+
+	//~ mesuresG[pointeurMesureG] = distanceG;
 //~ }
