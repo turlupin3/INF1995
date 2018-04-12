@@ -22,7 +22,6 @@ void setUpPWMoteur(){
 	
 	OCR0B = 0;
 	OCR0A = 0;
-
 }
 
 void arreterMoteur(){

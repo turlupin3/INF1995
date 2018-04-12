@@ -21,7 +21,7 @@
 #include <manips.h>
 #include <ambre.h>
 #include <can.h>
-
+ 
 enum  {
 	      proche, ok, loin // proche < 15cm, 15<= ok >= 60cm, loin > 60cm
 } volatile capteurD, capteurG;
@@ -59,6 +59,12 @@ int main(){
 	initialisation();
 	setUpPWMoteur();
 	partirMinuterie(100);
+	
+	//~ jouerNote(55);	 ///
+	//~ _delay_ms(200);	///
+	//~ arreterJouer();	///
+	
+	delSwitcher(1); // 1 = vert/// 2 = rouge /// 0 = off
 
 	if (capteurD == proche || capteurD == ok){ // permet de savoir quel cote on longe
 		longerDroite = true;				   // au debut du parcours
@@ -215,7 +221,7 @@ void ajustementGauche(){
 	// plus vite.
 	PORTC = ROUGE;
 	if (distanceG < 15){
-		controleMoteurG(50);
+		controleMoteurG(60);
 		while(distanceG < 14 || distanceG > 16){
 		}
 		controleMoteurG(43);
@@ -386,47 +392,64 @@ ISR(INT0_vect){
 }
 
 void partirMinuterie ( uint8_t duree ) {
-cli();
+//~ cli();
 // mode CTC du timer 1 avec horloge divisée par 1024
 
 // interruption après la durée spécifiée
 
-TCNT2 = 0;
+//~ TCNT2 = 0;
 
-OCR2A = duree;
+//~ OCR2A = duree;
+//~ OCR2B = duree;
 
-TCCR2A |= (0 << COM2A1);
-TCCR2A |= (0 << COM2B1);
-TCCR2A |= (0 << COM2A0);
-TCCR2A |= (0 << COM2B0);
+//~ TCCR2A |= (0 << COM2A1);
+//~ TCCR2A |= (0 << COM2B1);
+//~ TCCR2A |= (0 << COM2A0);
+//~ TCCR2A |= (0 << COM2B0);
 
-TCCR2B |= (1 << CS22);
-TCCR2B |= (1 << CS21);
-TCCR2B |= (1 << CS20);
+//~ TCCR2B |= (1 << CS22);
+//~ TCCR2B |= (1 << CS21);
+//~ TCCR2B |= (1 << CS20);
 
 
-//TCCR1C = 0;
+//~ //TCCR1C = 0;
 
-TIMSK2 |= (1 << OCIE2A);
-sei();
+//~ TIMSK2 |= (1 << OCIE2A);
+//~ sei();
+   cli();
+
+    TCNT2 = 0;
+    OCR2A = 127;
+    OCR2B = 225;
+
+    TCCR2A |= (0 << COM2A1); //normal port operation OC2A, OC2B disconected
+    TCCR2A |= (0 << COM2B1);
+    TCCR2A |= (0 << COM2A0);
+    TCCR2A |= (0 << COM2B0);
+
+    TCCR2B |= (1 << CS22);  //prescaler
+    TCCR2B |= (1 << CS21);
+    TCCR2B |= (1 << CS20);
+
+
+    //TCCR1C = 0;
+
+    TIMSK2 |= (1 << OCIE2A);
+    TIMSK2 |= (1 << OCIE2B);
+
+    sei();
 
 }
 
 ISR ( TIMER2_COMPA_vect  ) {
 
-	//~ DDRC= 0xff;
-	//~ PORTC= 2;
-	//~ DDRA = 0x00;
-	//~ can  convertisseurD = can();
-	//~ can  convertisseurG = can();
-	//~ lectureCapteurs();
+
 	lectureDonneeD = lecture8Bit(convertisseurD, 4);
-	//~ lectureDonneeG = lecture8Bit(convertisseurG, 5);
 	distanceD = 2478.633156*(pow(lectureDonneeD,-1.125));
-	if (distanceD < 15){ // si distance < 15cm
+	if (distanceD < 15){ 
 		capteurD = proche;
 	}
-	else if (distanceD > 60){ // si distance > 60cm
+	else if (distanceD > 60){ 
 		capteurD = loin;
 	}
 	
