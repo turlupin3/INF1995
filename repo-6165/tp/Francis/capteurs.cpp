@@ -55,7 +55,7 @@ int8_t pidD(float kp, float ki, float kd) {
 		return 100;
 	}
 	else if (retour < 0) {
-		return 0;
+		return abs(retour);
 	}
 	else {
 		return retour;
@@ -72,7 +72,8 @@ void wallFollow() {
 		controleMoteurD(pidD(0.5, 0, 0));
 		}
 	while(mesuresD[pointeurMesureD] > 17){
-		controleMoteurG(pidD(1, 0, 0));
+		PORTC = 0;
+		controleMoteurG(pidD(0.5, 0, 0));
 	}
 	controleMoteurG(75);
 	controleMoteurD(55);
