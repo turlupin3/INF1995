@@ -1,7 +1,7 @@
 #include <note.h>
 
 void setupPWMNote(){
-	DDRD = 0xff;
+	DDRD = 0xf0;
 	TCNT1 = 0x0;
 	
 	TCCR1A |= (1 << WGM10);	//mode PWM top ocr1a
@@ -21,8 +21,6 @@ void setupPWMNote(){
 	OCR1B = 0;
 	OCR1A = 0;
 	
-	//~ TIMSK1 |= (1<< OCIE1A);
-	TIMSK1 |= (1<< OCIE1B);
 
 }
 

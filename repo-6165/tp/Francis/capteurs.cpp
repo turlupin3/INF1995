@@ -19,8 +19,8 @@ int8_t pidD(float kp, float ki,float  kd);
 
 volatile const float ECARTENTREMESURES = 0.03264;
 volatile const uint8_t DISTANCEVOULUE = 15;
-volatile uint8_t erreurD = 0;
-volatile uint8_t erreurG = 0;
+volatile int8_t erreurD = 0;
+volatile int8_t erreurG = 0;
 volatile float tauxVariationD = 0;
 volatile float tauxVariationG = 0;
 volatile float integraleD = 0;
@@ -31,16 +31,17 @@ uint8_t mesuresD[120];
 uint8_t mesuresG[120];
 
 int main(){
+	
 	initialisationUART();
 	initialisation();
 	initializeSensor();
 	setUpPWMoteur();
 	
-	
+	DDRD = 0xf0;
 	while(true){
 		
 		wallFollow();
-		PORTC=1;
+		delSwitcher(0);
 
 
 	}
@@ -50,15 +51,12 @@ int main(){
 
 int8_t pidD(float kp, float ki, float kd) {
 	
-	int8_t retour = (kp * erreurD + ki * integraleD + kd * tauxVariationD);
-	if (retour > 100) {
+	int8_t retour = ( (kp * erreurD) + (ki * integraleD) + (kd * tauxVariationD) );
+	if (abs(retour) > 100) {
 		return 100;
 	}
-	else if (retour < 0) {
-		return abs(retour);
-	}
 	else {
-		return retour;
+		return abs(retour);
 	}
 }
 
@@ -68,12 +66,12 @@ void wallFollow() {
 	controleMoteurD(55);
 	
 	while(mesuresD[pointeurMesureD] < 12){
-		PORTC=2;
-		controleMoteurD(pidD(0.5, 0, 0));
+		delSwitcher(1);
+		controleMoteurD(pidD(10, 0, 0));
 		}
 	while(mesuresD[pointeurMesureD] > 17){
-		PORTC = 0;
-		controleMoteurG(pidD(0.5, 0, 0));
+		delSwitcher(2);
+		controleMoteurG(pidD(10, 0, 0));
 	}
 	controleMoteurG(75);
 	controleMoteurD(55);
@@ -158,9 +156,9 @@ ISR (TIMER2_COMPA_vect){
 	//uint8_t distanceD = uint8_t(964.2271747/((float)(lectureDonneeD)-28.6141603));
 	uint8_t distanceD = calculDistance(lectureDonneeD);
 	//~ transmissionUART(0xf7);
-	transmissionUART(distanceD);
+	//transmissionUART(distanceD);
 
-	erreurD = distanceD - DISTANCEVOULUE;
+	erreurD = DISTANCEVOULUE - distanceD;
 	tauxVariationD = (float)(erreurD) / ECARTENTREMESURES;
 	integraleD += (float)(distanceD - DISTANCEVOULUE)* ECARTENTREMESURES;
 
