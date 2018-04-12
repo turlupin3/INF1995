@@ -68,8 +68,8 @@ int main(){
 		longerDroite = false;
 		longerGauche = true;
 	}
-	controleMoteurG(0);
-	controleMoteurD(0);
+	controleMoteurG(43);
+	controleMoteurD(30);
 	
 	while(true){
 		ajustementDroite();
@@ -221,6 +221,7 @@ void ajustementDroite(){
 		}
 		controleMoteurG(43);
 		controleMoteurD(30);
+	}
 		//~ if (OCR0A + 50 > 255){
 			//~ OCR0A = 255;
 			//~ _delay_ms(200); // 200 est arbitraire
@@ -232,8 +233,13 @@ void ajustementDroite(){
 			//~ OCR0A = OCR0B;
 		//~ }
 	else if (distanceD > 23) {
-		controleMoteurD(50);
-		_delay_ms(1000);
+		controleMoteurG(50);
+		_delay_ms(450);
+		
+		while(distanceD > 17){
+			controleMoteurG(43);
+			controleMoteurD(30);
+		}
 	}
 	PORTC = VERT;
 }
