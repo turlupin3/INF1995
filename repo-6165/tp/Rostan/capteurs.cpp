@@ -305,36 +305,34 @@ void changerPanneau(){
 	// que le bot s'oriente vers le panneau gauche. Ensuite les roues 
 	// sont a la meme vitesse pour qu'il se dirige droit vers le panneau gauche
 	if (longerDroite == true){
-		if (OCR0A + 50 > 255){ // 50 est arbitraire
-			OCR0A = 255;
-		}
-		else{
-			OCR0A += 50;
-		}
+		controleMoteurD(55); // 55 ARBITRAIRE
+		//~ if (OCR0A + 50 > 255){ // 50 est arbitraire
+			//~ OCR0A = 255;
+		//~ }
+		//~ else{
+			//~ OCR0A += 50;
+		//~ }
 		_delay_ms(300); // 300 est arbitraire
-		OCR0A = OCR0B;
-		while(lectureDonneeG <= 84){
-		}								// si distance >= 17cm (arbitraire)
-			//lectureCapteurs();
-		longerDroite = false;
+		controleMoteurG(43);
+		controleMoteurD(30);
+		longerDroite = false; // avant ou apres while
 		longerGauche = true;
+		while(distanceG >= 17){
+		}								// si distance >= 17cm (arbitraire)
+		
 	}
 	
 	// meme chose mais avec la roue gauche
-	else{
-		if (OCR0B + 50 > 255){ // 50 est arbitraire
-			OCR0B = 255;
-		}
-		else{
-			OCR0B += 50;
-		}
+	else if (longerGauche == true){
+		controleMoteurG(65);
 		_delay_ms(300); // 300 est arbitraire
-		OCR0B = OCR0A;
-		while(lectureDonneeD <= 84){
-			}							// si distance >= 17cm (arbitraire)
-			//lectureCapteurs();
+		controleMoteurG(43);
+		controleMoteurD(30);
 		longerGauche = false;
 		longerDroite = true;
+		while(distanceD >= 17){
+			}							// si distance >= 17cm (arbitraire)
+		
 	}
 	droitChanger = false;
 	PORTC = VERT;
@@ -378,23 +376,23 @@ ISR(INT0_vect){
 	
 	if(longerDroite == true){
 		arreterMoteur();
-		while (lectureDonneeG != 94){ // si distance != 15cm
-			tournerDroite();
-			//lectureCapteurs();
+		while (distanceD < 14 || distanceD > 16){ // si distance != 15cm
+			tournerDroite(); // A FAIRE
 		}
 		arreterMoteur();
-		controleMoteur(60);
+		controleMoteurG(43);
+		controleMoteurD(30);
 		longerDroite = false;
 		longerGauche = true;
 	}
 	else{
 		arreterMoteur();
-		while (lectureDonneeD != 94){ // si distance != 15cm
-			tournerGauche();
-			//lectureCapteurs();
+		while (distanceD < 14 || distanceD > 16){ // si distance != 15cm
+			tournerGauche(); // A FAIRE
 		}
 		arreterMoteur();
-		controleMoteur(60);
+		controleMoteurG(43);
+		controleMoteurD(30);
 		longerGauche = false;
 		longerDroite = true;
 	}
