@@ -32,7 +32,7 @@ int main()
 	uint8_t intensiteLumineuse = 0;
 	
 	for(;;){
-		intensiteLumineuse = lecture8Bit(convertisseur, 0);
+		intensiteLumineuse = lecture8Bit(convertisseur, 5);
 		
 		if(intensiteLumineuse <= SEUILVERT){ //vert
 			PORTB = VERT;
