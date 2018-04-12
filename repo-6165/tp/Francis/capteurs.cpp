@@ -15,10 +15,16 @@ void initializeSensor();
 uint8_t lecture8Bit(can& conv, uint8_t pos);
 uint8_t calculDistance(uint8_t &donnee);
 void wallFollow();
+int8_t pidD(float kp, float ki,float  kd);
 
 volatile const float ECARTENTREMESURES = 0.03264;
+volatile const uint8_t DISTANCEVOULUE = 15;
+volatile uint8_t erreurD = 0;
+volatile uint8_t erreurG = 0;
 volatile float tauxVariationD = 0;
 volatile float tauxVariationG = 0;
+volatile float integraleD = 0;
+volatile float integraleG = 0;
 volatile uint8_t pointeurMesureD = 0;
 volatile uint8_t pointeurMesureG = 0;
 uint8_t mesuresD[120];
@@ -42,30 +48,32 @@ int main(){
 	return 0; 
 }
 
+int8_t pidD(float kp, float ki, float kd) {
+	
+	int8_t retour = (kp * erreurD + ki * integraleD + kd * tauxVariationD);
+	if (retour > 100) {
+		return 100;
+	}
+	else if (retour < 0) {
+		return abs(retour);
+	}
+	else {
+		return retour;
+	}
+}
+
 void wallFollow() {
 
 	controleMoteurG(75);
 	controleMoteurD(55);
 	
-	while(mesuresD[pointeurMesureD] < 12 || mesuresD[pointeurMesureD] > 17 ){
+	while(mesuresD[pointeurMesureD] < 12){
 		PORTC=2;
-		if(tauxVariationD > 0){
-
-			int8_t tmp = 75 + abs(15-mesuresD[pointeurMesureD]);
-			if(tmp > 100){
-				tmp = 100;
-			}
-			controleMoteurG(tmp);
-			
+		controleMoteurD(pidD(0.5, 0, 0));
 		}
-		else if(tauxVariationD < 0){
-		
-			int8_t tmp = 75 + abs(15-mesuresD[pointeurMesureD]);
-			if(tmp > 100){
-				tmp = 100;
-			}
-			controleMoteurD(tmp);
-		}
+	while(mesuresD[pointeurMesureD] > 17){
+		PORTC = 0;
+		controleMoteurG(pidD(0.5, 0, 0));
 	}
 	controleMoteurG(75);
 	controleMoteurD(55);
@@ -151,7 +159,10 @@ ISR (TIMER2_COMPA_vect){
 	uint8_t distanceD = calculDistance(lectureDonneeD);
 	//~ transmissionUART(0xf7);
 	transmissionUART(distanceD);
-	tauxVariationD = (float)(distanceD - mesuresD[pointeurMesureD]) / ECARTENTREMESURES;
+
+	erreurD = distanceD - DISTANCEVOULUE;
+	tauxVariationD = (float)(erreurD) / ECARTENTREMESURES;
+	integraleD += (float)(distanceD - DISTANCEVOULUE)* ECARTENTREMESURES;
 
 	if(pointeurMesureD != 120){
 		pointeurMesureD++;
@@ -174,7 +185,9 @@ ISR(TIMER2_COMPB_vect){
 	//~ transmissionUART(0xf6);
 	//~ transmissionUART(distanceG);
 
-	tauxVariationG = (float)(distanceG - mesuresG[pointeurMesureG]) / ECARTENTREMESURES;
+	erreurG = (distanceG - DISTANCEVOULUE);
+	tauxVariationG = (float)(erreurG) / ECARTENTREMESURES;
+	integraleG += (float)(erreurG)* ECARTENTREMESURES;
 
 	if (pointeurMesureG != 120) {
 		pointeurMesureG++;
