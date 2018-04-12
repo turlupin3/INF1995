@@ -78,7 +78,12 @@ int main(){
 	controleMoteurD(40);
 	_delay_ms(250);
 	while(true){
-		ajustementGauche();
+		ajustementDroite();
+		if(capteurG == loin){
+			if (capteurD == loin){
+				faireLeTourDroite();
+			}
+		}
 	}
 	//~ while(true){
 			//~ OCR0A = 0;
@@ -188,8 +193,13 @@ void ajustementDroite(){
 	// plus vite.
 	PORTC = ROUGE;
 	if (distanceD < 15){
-		controleMoteurD(50);
+		controleMoteurD(45);
 		while(distanceD < 14 || distanceD > 16){
+			if(capteurG == loin){
+				if (capteurD == loin){
+					faireLeTourDroite();
+			}
+		}
 		}
 		controleMoteurG(43);
 		controleMoteurD(30);
@@ -198,19 +208,29 @@ void ajustementDroite(){
 	// si le robot s'eloigne du panneau on fait tourner la roue gauche
 	// plus vite.
 	if (distanceD > 15 && distanceD < 20){ 
-		controleMoteurG(60);	
+		controleMoteurG(55);	
 		while(distanceD < 14 || distanceD > 16){
+			if(capteurG == loin){
+				if (capteurD == loin){
+					faireLeTourDroite();
+			}
+		}
 		}
 		controleMoteurG(43);
 		controleMoteurD(30);
 	}
 
 	else if (distanceD >= 20) {
-		controleMoteurG(55);
+		controleMoteurG(50);
 		_delay_ms(250);
 		controleMoteurG(43);
 		controleMoteurD(30);
 		while(distanceD > 16){
+			if(capteurG == loin){
+				if (capteurD == loin){
+					faireLeTourDroite();
+			}
+		}
 		}
 	}
 	PORTC = VERT;
@@ -221,7 +241,7 @@ void ajustementGauche(){
 	// plus vite.
 	PORTC = ROUGE;
 	if (distanceG < 15){
-		controleMoteurG(60);
+		controleMoteurG(55);
 		while(distanceG < 14 || distanceG > 16){
 		}
 		controleMoteurG(43);
@@ -231,7 +251,7 @@ void ajustementGauche(){
 	// si le robot s'eloigne du panneau on fait tourner la roue droite
 	// plus vite.
 	if (distanceG > 15 && distanceG < 20){ 
-		controleMoteurD(50);	
+		controleMoteurD(45);	
 		while(distanceG < 14 || distanceG > 16){
 		}
 		controleMoteurG(43);
@@ -239,7 +259,7 @@ void ajustementGauche(){
 	}
 
 	else if (distanceG >= 20) {
-		controleMoteurD(55);
+		controleMoteurD(40);
 		_delay_ms(250);
 		controleMoteurG(43);
 		controleMoteurD(30);
@@ -253,37 +273,29 @@ void faireLeTourDroite(){
 	// un roue tourne plus vite et l'autre moins vite pour contourner le panneau
 	// jusqu'a temps que le capteur capte 15cm
 	PORTC = ROUGE;
-	if (OCR0B + 50 > 255) // 50 est arbitraire
-		OCR0B = 255;
-	else
-		OCR0B += 50;
-	if (OCR0A - 50 < 0) // 50 est arbitraire
-		OCR0A = 0;
-	else
-		OCR0A -= 50;
-	while (lectureDonneeD <= 90){ // si distance >= 15cm (arbitraire)
+	controleMoteurG(70);
+	//~ if (OCR0A - 50 < 0) // 50 est arbitraire
+		//~ OCR0A = 0;
+	//~ else
+		//~ OCR0A -= 50;
+	while (distanceD >= 15){ // si distance >= 15cm (arbitraire)
 		//lectureCapteurs();
 	}	 
-	OCR0A = 150;
-	OCR0B = OCR0A;
+	controleMoteurG(43);
 	PORTC = VERT;
 }
 
 void faireLeTourGauche(){
 	PORTC = ROUGE;
-	if (OCR0A + 50 > 255) // 50 est arbitraire
-		OCR0A = 255;
-	else
-		OCR0A += 50;
-	if (OCR0B - 50 < 0) // 50 est arbitraire
-		OCR0B = 0;
-	else
-		OCR0B -= 50;
+	controleMoteurD(60);
+	//~ if (OCR0B - 50 < 0) // 50 est arbitraire
+		//~ OCR0B = 0;
+	//~ else
+		//~ OCR0B -= 50;
 	while (lectureDonneeG <= 90){ // si distance >= 15cm (arbitraire)
 		//lectureCapteurs();
 	}	 
-	OCR0B = 150;
-	OCR0A = OCR0B;
+	controleMoteurD(30);
 	PORTC = VERT;
 }
 
