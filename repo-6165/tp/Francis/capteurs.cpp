@@ -67,11 +67,11 @@ void wallFollow() {
 	
 	while(mesuresD[pointeurMesureD] < 12){
 		delSwitcher(1);
-		controleMoteurD(pidD(10, 0, 0));
+		controleMoteurD(pidD(2, 0, 0));
 		}
 	while(mesuresD[pointeurMesureD] > 17){
 		delSwitcher(2);
-		controleMoteurG(pidD(10, 0, 0));
+		controleMoteurG(pidD(2, 0, 0));
 	}
 	controleMoteurG(75);
 	controleMoteurD(55);
