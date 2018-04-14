@@ -28,7 +28,7 @@ enum  {
 
 uint8_t lecture8Bit(can& conv, uint8_t pos);
 
-void lectureCapteurs();
+void poteau();
 void ajustementDroite();
 void ajustementGauche();
 void faireLeTourDroite();
@@ -64,23 +64,32 @@ int main(){
 	//~ arreterJouer();	///
 	
 	delSwitcher(1); // 1 = vert/// 2 = rouge /// 0 = off
-
+	
+	_delay_ms(250); // Il faut mettre un delay pour que le if fonctionne
+	
 	if (distanceD < 60){ // permet de savoir quel cote on longe
-		
+
 		longerDroite = true;				   // au debut du parcours
 		longerGauche = false; 
 	}
-	else if (capteurD == loin) {
-		jouerNote(69);
+	else {
+		jouerNote(55);
+		_delay_ms(200);
+		arreterJouer();
 		longerDroite = false;
 		longerGauche = true;
 	}
-	controleMoteurG(53);
-	controleMoteurD(40);
+	
+	controleMoteurG(63);
+	controleMoteurD(50);
 	_delay_ms(250);
-	longerDroite = true;
 	while(true){
 		ajustementDroite();
+		if(capteurD == loin){
+				if(capteurG == loin){
+					faireLeTourDroite();
+				}
+			}
 		}
 	//~ while(true){
 			//~ OCR0A = 0;
@@ -161,14 +170,15 @@ uint8_t lecture8Bit(can& conv, uint8_t pos){
 void ajustementDroite(){
 	// si le robot se dirige vers le panneau on fait tourner la roue droite
 	// plus vite.
+	//delSwitcher(2);
 	if (distanceD < 15){
-		controleMoteurD(55);
+		controleMoteurD(45);
 		while(distanceD < 14 || distanceD > 16){
-			if(capteurG == loin){
-				if (capteurD == loin){
+			if(capteurD == loin){
+				if(capteurG == loin){
 					faireLeTourDroite();
+				}
 			}
-		}
 		}
 		controleMoteurG(43);
 		controleMoteurD(30);
@@ -177,13 +187,13 @@ void ajustementDroite(){
 	// si le robot s'eloigne du panneau on fait tourner la roue gauche
 	// plus vite.
 	if (distanceD > 15 && distanceD < 20){ 
-		controleMoteurG(55);	
+		controleMoteurG(55);
 		while(distanceD < 14 || distanceD > 16){
-			if(capteurG == loin){
-				if (capteurD == loin){
+			if(capteurD == loin){
+				if(capteurG == loin){
 					faireLeTourDroite();
+				}
 			}
-		}
 		}
 		controleMoteurG(43);
 		controleMoteurD(30);
@@ -195,21 +205,28 @@ void ajustementDroite(){
 		controleMoteurG(43);
 		controleMoteurD(30);
 		while(distanceD > 16){
-			if(capteurG == loin){
-				if (capteurD == loin){
+			if(capteurD == loin){
+				if(capteurG == loin){
 					faireLeTourDroite();
+				}
 			}
 		}
-		}
 	}
+	//delSwitcher(1);
 }
 
 void ajustementGauche(){
 	// si le robot se dirige vers le panneau on fait tourner la roue gauche
 	// plus vite.
+	//delSwitcher(2);
 	if (distanceG < 15){
 		controleMoteurG(55);
 		while(distanceG < 14 || distanceG > 16){
+			if(capteurG == loin){
+				if(capteurD == loin){
+					faireLeTourGauche();
+				}
+			}
 		}
 		controleMoteurG(43);
 		controleMoteurD(30);
@@ -220,6 +237,11 @@ void ajustementGauche(){
 	if (distanceG > 15 && distanceG < 20){ 
 		controleMoteurD(45);	
 		while(distanceG < 14 || distanceG > 16){
+			if(capteurG == loin){
+				if(capteurD == loin){
+					faireLeTourGauche();
+				}
+			}
 		}
 		controleMoteurG(43);
 		controleMoteurD(30);
@@ -231,30 +253,45 @@ void ajustementGauche(){
 		controleMoteurG(43);
 		controleMoteurD(30);
 		while(distanceG > 16){
+			if(capteurG == loin){
+				if(capteurD == loin){
+					faireLeTourGauche();
+				}
+			}
 		}
 	}
+	//delSwitcher(1);
 }
 
 void faireLeTourDroite(){
 	// un roue tourne plus vite et l'autre moins vite pour contourner le panneau
 	// jusqu'a temps que le capteur capte 15cm
+	//delSwitcher(2);
 	controleMoteurG(70);
+	controleMoteurD(30);
 	while (distanceD >= 15){
 	}	 
 	controleMoteurG(43);
+	controleMoteurD(30);
+	//delSwitcher(1);
 }
 
 void faireLeTourGauche(){
+	//delSwitcher(2);
 	controleMoteurD(60);
+	controleMoteurG(43);
 	while (distanceG >= 15){
 	}	 
+	controleMoteurG(43);
 	controleMoteurD(30);
+	//delSwitcher(1);
 }
 
 void changerPanneau(){
 	// La roue droite va tourner plus vite pendant quelque temps pour
 	// que le bot s'oriente vers le panneau gauche. Ensuite les roues 
 	// sont a la meme vitesse pour qu'il se dirige droit vers le panneau gauche
+	//delSwitcher(2);
 	if (longerDroite == true){
 		controleMoteurD(55); // 55 ARBITRAIRE
 		_delay_ms(300); // 300 est arbitraire
@@ -280,6 +317,25 @@ void changerPanneau(){
 		
 	}
 	droitChanger = false;
+	//delSwitcher(1);
+}
+
+void poteau(){
+	jouerNote(69);
+	_delay_ms(200);
+	arreterJouer();
+	
+	_delay_ms(100);
+	
+	jouerNote(69);
+	_delay_ms(200);
+	arreterJouer();
+	
+	_delay_ms(100);
+	
+	jouerNote(69);
+	_delay_ms(200);
+	arreterJouer();
 }
 
 
@@ -315,33 +371,54 @@ ISR(INT0_vect){
 	if(antiRebond()){
 		boutonPoussoir = 1;
 	}
+	//delSwitcher(2);
 	if(longerDroite == true){
+		
+		//~ arreterMoteur();
+		//~ _delay_ms(750);
 		
 		longerDroite = false;
 		longerGauche = true;
+		
+		setUpPWMoteur();
 		controleMoteurG(-50);
 		controleMoteurD(37);
-		while (distanceG < 14 || distanceG > 16){
 		
-		};	
-
+		_delay_ms(750);
+		jouerNote(55);
+		_delay_ms(200);
+		arreterJouer();
+		//~ while (distanceG < 14 || distanceG > 16){
+		
+		//~ }
 		
 		controleMoteurG(43);
 		controleMoteurD(30);
 	}
 	else{
-		arreterMoteur();
+		//~ arreterMoteur();
+		//~ _delay_ms(750);
+		
 		longerGauche = false;
 		longerDroite = true;
+		
+		setUpPWMoteur();
 		controleMoteurG(50);
 		controleMoteurD(-37);
-		while (distanceD < 14 || distanceD > 16){
-		}
+		
+		_delay_ms(750);
+		//~ jouerNote(55);
+		//~ _delay_ms(200);
+		//~ arreterJouer();
+		
+		//~ while (distanceD < 14 || distanceD > 16){
+		//~ }
+		
 		controleMoteurG(43);
 		controleMoteurD(30);
 		
 	}
-	
+	//delSwitcher(1);
 	EIFR |= (1 << INTF0);
 }
 
