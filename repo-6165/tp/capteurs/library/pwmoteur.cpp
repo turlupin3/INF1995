@@ -22,7 +22,6 @@ void setUpPWMoteur(){
 	
 	OCR0B = 0;
 	OCR0A = 0;
-
 }
 
 void arreterMoteur(){
@@ -55,9 +54,8 @@ void controleMoteur(int8_t op) {
 	}
 	
 	uint8_t tmp = op *2.55;
-	double temp = tmp*0.80;
 	OCR0B = tmp;
-	OCR0A = temp;
+	OCR0A = tmp;
 	
 }
 

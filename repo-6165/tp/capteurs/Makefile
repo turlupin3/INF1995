@@ -23,7 +23,7 @@ MCU=atmega324pa
 
 # Nom de votre projet
 # (utilisez un seul mot, exemple: 'monprojet')
-PROJECTNAME=tp10
+PROJECTNAME=capteurs
 
 # Fichiers sources
 # Utilisez le suffixe .cpp pour les fichiers C++
