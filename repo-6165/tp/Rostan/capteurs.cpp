@@ -50,7 +50,7 @@ volatile uint8_t lectureDonneeG= 0;
 
 volatile uint8_t boutonPoussoir = 0;
 const volatile uint8_t vitesseRoueG = 50;
-const volatile uint8_t vitesseRoueD = vitesseRoueG - 10;
+const volatile uint8_t vitesseRoueD = vitesseRoueG - 8;
 
 
 int main(){	
@@ -68,102 +68,94 @@ int main(){
 	
 	_delay_ms(250); // Il faut mettre un delay pour que le if fonctionne
 	
-	//~ if (distanceD < 60){ // permet de savoir quel cote on longe
+	if (distanceD < 60){ // permet de savoir quel cote on longe
 
-		//~ longerDroite = true;				   // au debut du parcours
-		//~ longerGauche = false; 
-	//~ }
-	//~ else {
-		//~ jouerNote(55);
-		//~ _delay_ms(200);
-		//~ arreterJouer();
-		//~ longerDroite = false;
-		//~ longerGauche = true;
-	//~ }
-	allerDroit();
-	longerGauche = true;
-	droitChanger = true;
+		longerDroite = true;				   // au debut du parcours
+		longerGauche = false; 
+	}
+	else {
+
+		longerDroite = false;
+		longerGauche = true;
+	}
 	
-	while (true){
-		if (distanceD < 60){
-			jouerNote(69);
-			_delay_ms(200);
-			arreterJouer();
-			changerPanneau();
+	allerDroit();
+	
+	//~ while (true){
+		//~ if (longerDroite == true && droitChanger == true){
+			//~ if (distanceG < 60){
+				//~ jouerNote(69);
+				//~ _delay_ms(200);
+				//~ arreterJouer();
+				//~ changerPanneau();
+				//~ if (distangeG < 14 || distanceG > 16){
+					//~ ajustementDroite();
+				//~ }
+			//~ }
 			
-			while (true){
-				ajustementDroite();
+		//~ }
+	//~ }
+
+	while(true){
+		if (longerDroite == true){ 		// switch case lorsqu'on longe la droite
+			switch(capteurD){
+				case proche:
+					if(capteurG == loin)
+						droitChanger = true;
+					if (capteurG == ok && droitChanger == true)
+						changerPanneau();
+					if(distanceD < 15)
+						ajustementDroite(); 
+					break;
+					
+				case ok:
+					if(capteurG == loin)
+						droitChanger = true;
+					if (capteurG == ok && droitChanger == true)
+						changerPanneau();
+					if (distanceD < 15)
+						ajustementDroite();
+					break;
+						
+				case loin:
+					if (capteurG == loin){
+						droitChanger = true;
+						faireLeTourDroite();
+					}
+					break;
 			}
 		}
-	}
-
-	//~ while(true){
-			//~ OCR0A = 0;
-			//~ _delay_ms(1000);
-		 //~ ajustementDroite();
-		 //ajustementGauche();
-		//~ }
-		//~ //lectureCapteurs();
 		
-		//~ if (longerDroite == true){ 		// switch case lorsqu'on longe la droite
-			//~ switch(capteurD){
-				//~ case proche:
-					//~ if(capteurG == loin)
-						//~ droitChanger = true;
-					//~ if (capteurG == ok && droitChanger == true)
-						//~ changerPanneau();
-					//~ if(lectureDonneeD > 94) // si distance < 15cm
-						//~ ajustementDroite(); 
-					//~ break;
+		
+		if (longerGauche == true){		// switch case lorsqu'on longe la gauche
+			switch(capteurG){
+				case proche:
+					if(capteurD == loin)
+						droitChanger = true;
+					if (capteurD == ok && droitChanger == true)
+						changerPanneau();
+					if(distanceG < 15)
+						ajustementGauche();
+					break;
 					
-				//~ case ok:
-					//~ if(capteurG == loin)
-						//~ droitChanger = true;
-					//~ if (capteurG == ok && droitChanger == true)
-						//~ changerPanneau();
-					//~ if (lectureDonneeD < 94) // si distance > 15cm
-						//~ ajustementDroite();
-					//~ break;
+				case ok:
+					if (capteurD == loin)
+						droitChanger = true;
+					if (capteurD == ok && droitChanger == true)
+						changerPanneau();
+					if (distanceG < 15)
+						ajustementGauche();
+					break;
 						
-				//~ case loin:
-					//~ if (capteurG == loin){
-						//~ droitChanger = true;
-						//~ faireLeTourDroite();
-					//~ }
-					//~ break;
-			//~ }
-		//~ }
-		
-		
-		//~ if (longerGauche == true){		// switch case lorsqu'on longe la gauche
-			//~ switch(capteurG){
-				//~ case proche:
-					//~ if(capteurD == loin)
-						//~ droitChanger = true;
-					//~ if (capteurD == ok && droitChanger == true)
-						//~ changerPanneau();
-					//~ if(lectureDonneeG > 94) // si distance < 15cm
-						//~ ajustementGauche();
-					//~ break;
-					
-				//~ case ok:
-					//~ if (capteurD == loin)
-						//~ droitChanger = true;
-					//~ if (capteurD == ok && droitChanger == true)
-						//~ changerPanneau();
-					//~ if (lectureDonneeG < 94) // si distance > 15cm
-						//~ ajustementGauche();
-					//~ break;
-						
-				//~ case loin:
-					//~ if (capteurD == loin){
-						//~ droitChanger = true;
-						//~ faireLeTourGauche();
-					//~ }
-					//~ break;
-			//~ }
-		//~ }
-	 //~ }
+				case loin:
+					if (capteurD == loin){
+						droitChanger = true;
+						faireLeTourGauche();
+					}
+					break;
+			}
+		}
+	 }
 	
 	return 0; 
 }
@@ -296,23 +288,29 @@ void changerPanneau(){
 		allerDroit();
 		longerDroite = false; // avant ou apres while
 		longerGauche = true;
-		while(distanceG >= 22){
+		while(distanceG >= 20){
 		}
-		
+		controleMoteurD(vitesseRoueG+30);
+		_delay_ms(700);
+		allerDroit();
 	}
 	
 	// meme chose mais avec la roue gauche
 	else if (longerGauche == true){
 		controleMoteurG(vitesseRoueG+20);
-		_delay_ms(750); // 300 est arbitraire
+		_delay_ms(750); // 750 est arbitraire
 		allerDroit();
 		longerGauche = false;
 		longerDroite = true;
-		while(distanceD >= 22){
+		while(distanceD >= 20){
 			}
 		jouerNote(69);
 		_delay_ms(200);
 		arreterJouer();
+		
+		controleMoteurD(vitesseRoueD+30);
+		_delay_ms(700);
+		allerDroit();
 	}
 	droitChanger = false;
 	//delSwitcher(1);
