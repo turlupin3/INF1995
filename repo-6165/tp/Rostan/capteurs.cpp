@@ -82,13 +82,16 @@ int main(){
 	
 	quelCote();
 	allerDroit();
-	
-	while(true){
-		ajustementDroite();
-		if(etat == faireTour){
-				faireLeTour();
-			}
+	if (longerDroite == true){
+		jouerNote(55);
+		_delay_ms(200);
+		arreterJouer();
 	}
+	while(true){
+		wallFollow();
+	}
+
+
 
 	//~ while (true){
 		//~ switch (etat){
@@ -124,14 +127,34 @@ void allerDroit(){
 
 // permet de savoir quel cote on longe au debut
 void quelCote(){
-	if (distanceD < 60){ 
+	if (distanceD <= distanceG){
 		longerDroite = true;
-		longerGauche = false; 
+		longerGauche = false;
 	}
-	else {
+	else if(distanceD > distanceG) {
 		longerDroite = false;
 		longerGauche = true;
 	}
+	//~ if (distanceD < 60 && distanceG < 60) {
+		//~ ///problematic
+		//~ jouerNote(55);
+		//~ _delay_ms(500);
+		//~ arreterJouer();
+	//~ }
+	//~ else if (distanceD < 60){ 
+		//~ longerDroite = true;
+		//~ longerGauche = false; 
+	//~ }
+	//~ else if (distanceG < 60){
+		//~ longerDroite = false;
+		//~ longerGauche = true;
+	//~ }
+	//~ else {
+		//~ ///problematic
+		//~ jouerNote(60);
+		//~ _delay_ms(500);
+		//~ arreterJouer();
+	//~ }
 }
 	
 void wallFollow(){
@@ -190,7 +213,7 @@ void ajustementGauche(){
 	// plus vite.
 	delSwitcher(2);
 	if (distanceG < 15){
-		controleMoteurG(vitesseRoueG+7);
+		controleMoteurG(vitesseRoueG+10);
 		while(distanceG < 14){
 			if(etat == faireTour){
 				faireLeTour();
@@ -229,6 +252,7 @@ void ajustementGauche(){
 }
 void faireLeTour(){
 	if (longerDroite == true){
+		
 		faireLeTourDroite();
 	}
 	if (longerGauche == true){
@@ -243,7 +267,7 @@ void faireLeTourDroite(){
 	controleMoteurG(vitesseRoueG+25);
 	controleMoteurD(vitesseRoueD);
 	while (distanceD >= 15){
-	}	 
+	}
 	allerDroit();
 	delSwitcher(1);
 }
@@ -285,9 +309,6 @@ void changerPanneau(){
 		longerDroite = true;
 		while(distanceD >= 20){
 			}
-		jouerNote(69);
-		_delay_ms(200);
-		arreterJouer();
 		
 		controleMoteurD(vitesseRoueD+30);
 		_delay_ms(700);

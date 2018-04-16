@@ -72,6 +72,8 @@ void initialisation();
 bool antiRebond();
 void partirMinuterie();
 
+void sequence(uint8_t noteI,uint8_t noteII,uint8_t noteIII);
+
 
 //~ jouerNote(55);
 //~ _delay_ms(200);
@@ -85,37 +87,66 @@ int main(){
 	setUpPWMoteur();
 	partirMinuterie();
 	
+	
+	jouerNote(69);
+	_delay_ms(200);
+	arreterJouer();
+	_delay_ms(50);
+	jouerNote(73);
+	_delay_ms(200);
+	arreterJouer();
+	_delay_ms(50);
+	jouerNote(76);
+	_delay_ms(200);
+	arreterJouer();
+	
 	_delay_ms(250); // Il faut mettre un delay pour que le if fonctionne
 	
 	quelCote();
 	allerDroit();
 	
-	while(true){
+	//while(true){
 		//~ ajustementDroite();
 		//~ if(etat == faireTour){
 				//~ faireLeTour();
 			//~ }
-	}
+	//}
 
-	//~ while (true){
-		//~ switch (etat){
-			//~ case longerMur:
-				//~ wallFollow();
-				//~ break;
+	while (true){
+		switch (etat){
+			case longerMur:
+				wallFollow();
+				break;
 				
-			//~ case faireTour:
-				//~ faireLeTour();
-				//~ break;
+			case faireTour:
+			
+			///debug Ligne
+				controleMoteurG(0);
+				controleMoteurD(0);
+				sequence(52,50,52);
+				allerDroit();
+			///debug Ligne	
+				faireLeTour();
+				break;
 				
-			//~ case changerPan:
-				//~ changerPanneau();
-				//~ break;
+			case changerPan:
+				sequence(40,50,60);
+				changerPanneau();
+				break;
 				
 			//~ case detectionPoteau:
 				//~ poteau();
 				//~ break;
-		//~ };	
-	//~ }
+			default: 
+				jouerNote(69);
+				_delay_ms(200);
+				arreterJouer();
+				_delay_ms(200);
+				jouerNote(69);
+				_delay_ms(200);
+				arreterJouer();
+		};	
+	}
 	return 0; 
 }
 
@@ -207,9 +238,22 @@ void ajustementDroite(){
 }
 
 void ajustementGauche(){
+	
 	// si le robot se dirige vers le panneau on fait tourner la roue gauche
 	// plus vite.
 	delSwitcher(2);
+	///
+	if (distanceG < 10){
+		controleMoteurG(vitesseRoueG+30);
+		while(distanceG < 10){
+			if(etat == faireTour){
+				faireLeTour();
+			}
+		}
+		allerDroit();
+	}
+	///
+	
 	if (distanceG < 15){
 		controleMoteurG(vitesseRoueG+7);
 		while(distanceG < 14){
@@ -242,12 +286,13 @@ void ajustementGauche(){
 				faireLeTour();
 			}
 		}
-		controleMoteurD(vitesseRoueD+30);
-		_delay_ms(700);
+		//controleMoteurD(vitesseRoueD+30);
+		//_delay_ms(700);
 		allerDroit();
 	}
 	delSwitcher(1);
 }
+
 void faireLeTour(){
 	if (longerDroite == true){
 		faireLeTourDroite();
@@ -334,6 +379,7 @@ void determinerObstacle(){
 		
 	//~ }
 }
+
 void poteau(){
 	arreterMoteur();
 	
@@ -356,7 +402,6 @@ void poteau(){
 	setUpPWMoteur();
 	allerDroit();
 }
-
 
 // les trois fonctions suivantes pour l'interrupt
 bool antiRebond(){
@@ -429,44 +474,58 @@ ISR(INT0_vect){
 void determinerEtat(){
 	
 	if (longerDroite == true){ // On redonne droit de changer si detecte rien
-		if (distanceG > 60) {
-			droitChanger = true;
-		}
-		if (distanceG < 60){ // des qu'il detecte un obstacle, on doit determiner le type (mur ou poteau)
-			determinerObstacle();
+		if(distanceD > 60 && distanceG > 60){
+			etat = faireTour;
 		}
 		
-		if (distanceG < 60 && estPoteau == true){
-			etat = detectionPoteau;
-		}
 		else if (distanceG < 60 && droitChanger == true && estPoteau == false){
 			etat = changerPan;
 		}
-		else if(distanceD > 60 && distanceG > 60){
-			etat = faireTour;
+		
+		else if (distanceG < 60 && estPoteau == true){
+			etat = detectionPoteau;
 		}
+		
+		
+		
+		else if (distanceG > 60) {
+			droitChanger = true;
+		}
+		else if (distanceG < 60){ // des qu'il detecte un obstacle, on doit determiner le type (mur ou poteau)
+			determinerObstacle();
+		}
+		
+		
+		
+		
 		else {
 			etat = longerMur;
 		}
 	}
 	
 	else{
-		if (distanceD > 60) {
-			droitChanger = true;
-		}
-		if (distanceD < 60){
-			determinerObstacle();
+		if(distanceG > 60 && distanceD > 60){
+			etat = faireTour;
 		}
 		
-		if (distanceD < 60 && estPoteau == true){
-			etat = detectionPoteau;
-		}
 		else if (distanceD < 60 && droitChanger == true && estPoteau == false){
 			etat = changerPan;
 		}
-		else if(distanceG > 60 && distanceD > 60){
-			etat = faireTour;
+		
+		else if (distanceD < 60 && estPoteau == true){
+			etat = detectionPoteau;
 		}
+		
+		else if (distanceD > 60) {
+			droitChanger = true;
+		}
+		else if (distanceD < 60){
+			determinerObstacle();
+		}
+		
+		
+		
+		
 		else {
 			etat = longerMur;
 		}
@@ -521,6 +580,7 @@ ISR ( TIMER2_COMPA_vect  ) { // timer pour capteurD
 	 //transmissionUART(distanceD);
 
 }
+
 ISR ( TIMER2_COMPB_vect  ) { // timer pour capteurG
 	
 	lectureDonneeG = lecture8Bit(convertisseurG, 5);
@@ -540,6 +600,20 @@ ISR ( TIMER2_COMPB_vect  ) { // timer pour capteurG
 	//~ transmissionUART(0xf7);
 	//transmissionUART('G');
 	// transmissionUART((int)mesuresG[0]);
+}
+
+void sequence(uint8_t noteI,uint8_t noteII,uint8_t noteIII) {
+	jouerNote(noteI);
+	_delay_ms(150);
+	arreterJouer();
+	_delay_ms(25);
+	jouerNote(noteII);
+	_delay_ms(150);
+	arreterJouer();
+	_delay_ms(25);
+	jouerNote(noteIII);
+	_delay_ms(150);
+	arreterJouer();
 }
 
 
