@@ -60,8 +60,8 @@ bool longerGauche;
 bool droitChanger = true;
 uint8_t mesuresD[120];
 uint8_t mesuresG[120];
-uint8_t medianD[60];
-uint8_t medianG[60];
+uint8_t medianD[7];
+uint8_t medianG[7];
 
 //fonctions
 uint8_t lecture8Bit(can& conv, uint8_t pos);
@@ -552,10 +552,10 @@ ISR ( TIMER2_COMPA_vect  ) { // timer pour capteurD
 	else {
 		pointeurMesureD = 0;
 	}
-	medianD[30] = distanceD;
-	sort(medianD, 60);
-	distanceD = medianD[30];
-	mesuresD[pointeurMesureD] = medianD[30];
+	medianD[pointeurMesureD % 7] = distanceD;
+	sort(medianD, 7);
+	distanceD = medianD[4];
+	mesuresD[pointeurMesureD] = medianD[4];
 
 	transmissionUART(0xf7);
 	transmissionUART(distanceD);
@@ -578,10 +578,10 @@ ISR ( TIMER2_COMPB_vect  ) { // timer pour capteurG
 		pointeurMesureG = 0;
 	}
 
-	medianG[1] = distanceG;
-	sort(medianG, 60);
-	distanceG = medianG[30];
-	mesuresG[pointeurMesureG] = medianG[30];
+	medianG[pointeurMesureG % 7] = distanceG;
+	sort(medianG, 7);
+	distanceG = medianG[4];
+	mesuresG[pointeurMesureG] = medianG[4];
 	
 
 	transmissionUART(0xf6);
