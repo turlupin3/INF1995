@@ -60,6 +60,8 @@ bool longerGauche;
 bool droitChanger = true;
 uint8_t mesuresD[120];
 uint8_t mesuresG[120];
+uint8_t medianD[60];
+uint8_t medianG[60];
 
 //fonctions
 uint8_t lecture8Bit(can& conv, uint8_t pos);
@@ -80,8 +82,9 @@ void changerPanneau();
 void initialisation();
 bool antiRebond();
 void partirMinuterie();
-void calculerDistance();
+uint8_t calculerDistance(uint8_t donnee);
 void sequence(uint8_t noteI,uint8_t noteII,uint8_t noteIII);
+void sort(uint8_t * donnees, uint8_t size);
 
 
 //~ jouerNote(55);
@@ -120,8 +123,8 @@ int main(){
 		
 		switch (etat){
 			case longerMur:
-				transmissionUART('L');
-				transmissionUART(' ');
+				//~ transmissionUART('L');
+				//~ transmissionUART(' ');
 				wallFollow();
 				delSwitcher(1);
 				
@@ -141,8 +144,8 @@ int main(){
 				//~ break;
 				
 			case changerPan:
-				transmissionUART('P');
-				transmissionUART(' ');
+				//~ transmissionUART('P');
+				//~ transmissionUART(' ');
 				delSwitcher(2);
 				changerPanneau();
 				
@@ -446,7 +449,7 @@ void determinerEtat(){
 	
 	if (longerDroite){ // On redonne droit de changer si detecte rien
 		
-		jouerNote(55);
+		//~ jouerNote(55);
 
 		if (distanceG > 60) {
 			droitChanger = true;
@@ -475,7 +478,7 @@ void determinerEtat(){
 	
 	else if (longerGauche){
 		
-		jouerNote(48);
+		//~ jouerNote(48);
 
 		
 		if (distanceD > 60) {
@@ -537,7 +540,7 @@ ISR ( TIMER2_COMPA_vect  ) { // timer pour capteurD
 
 	mesuresD[pointeurMesureD] = distanceD;
 	lectureDonneeD = lecture8Bit(convertisseurD, 4);
-	calculerDistance();
+	distanceD = calculerDistance(lectureDonneeD);
 	
 	erreurD = DISTANCEVOULUE - distanceD;
 	tauxVariationD = (float)(erreurD) / ECARTENTREMESURES;
@@ -549,17 +552,20 @@ ISR ( TIMER2_COMPA_vect  ) { // timer pour capteurD
 	else {
 		pointeurMesureD = 0;
 	}
-	mesuresD[pointeurMesureD] = distanceD;
+	medianD[30] = distanceD;
+	sort(medianD, 60);
+	distanceD = medianD[30];
+	mesuresD[pointeurMesureD] = medianD[30];
 
-	//transmissionUART(0xf7);
-	//transmissionUART(distanceD);
+	transmissionUART(0xf7);
+	transmissionUART(distanceD);
 	sei();
 }
 
 ISR ( TIMER2_COMPB_vect  ) { // timer pour capteurG
 	cli();
 	lectureDonneeG = lecture8Bit(convertisseurG, 5);
-	calculerDistance();
+	distanceG = calculerDistance(lectureDonneeG);
 	
 	erreurG = (distanceG - DISTANCEVOULUE);
 	tauxVariationG = (float)(erreurG) / ECARTENTREMESURES;
@@ -572,12 +578,14 @@ ISR ( TIMER2_COMPB_vect  ) { // timer pour capteurG
 		pointeurMesureG = 0;
 	}
 
-	mesuresG[pointeurMesureG] = distanceG;
+	medianG[1] = distanceG;
+	sort(medianG, 60);
+	distanceG = medianG[30];
+	mesuresG[pointeurMesureG] = medianG[30];
 	
 
-	//transmissionUART(0xf6);
-	//transmissionUART('G');
-	//transmissionUART(distanceG);
+	transmissionUART(0xf6);
+	transmissionUART(distanceG);
 	determinerEtat();
 	sei();
 }
@@ -596,22 +604,59 @@ void sequence(uint8_t noteI,uint8_t noteII,uint8_t noteIII) {
 	arreterJouer();
 }
 
-void calculerDistance(){
-	distanceG = 2478.633156*(pow(lectureDonneeG,-1.125));
-	if(distanceG > 65){
-		distanceG = 65;
-	}
-	if(distanceG < 10){
-		distanceG = 10;
-	}
+uint8_t calculerDistance(uint8_t donnee){
+	//~ distanceG = 2478.633156*(pow(lectureDonneeG,-1.125));
+	//~ if(distanceG > 65){
+		//~ distanceG = 65;
+	//~ }
+	//~ if(distanceG < 10){
+		//~ distanceG = 10;
+	//~ }
 	
-	distanceD = 2478.633156*(pow(lectureDonneeD,-1.125));
-	if(distanceD > 65){
-		distanceD = 65;
+	//~ distanceD = 2478.633156*(pow(lectureDonneeD,-1.125));
+	//~ if(distanceD > 65){
+		//~ distanceD = 65;
+	//~ }
+	//~ if(distanceD < 10){
+		//~ distanceD = 10;
+	//~ }
+	
+		if (donnee > 132) {
+		return 10;
 	}
-	if(distanceD < 10){
-		distanceD = 10;
+	else if (donnee > 91) {
+		return (uint8_t)(-0.12 * (float)(donnee)+26.1);
+	}
+	else if (donnee > 70) {
+		return (uint8_t)(-0.24 * (float)(donnee)+36.67);
+	}
+	else if (donnee > 49) {
+		return (uint8_t)(-0.48 * (float)(donnee)+53.33);
+	}
+	else if (donnee > 37) {
+		return (uint8_t)(-0.83 * (float)(donnee)+70.83);
+	}
+	else if (donnee > 22) {
+		return (uint8_t)(-2 * (float)(donnee)+114);
+	}
+	else {
+		return 75;
 	}
 }
 
-
+void sort(uint8_t * donnees, uint8_t size){
+	bool swapped = true;
+	uint8_t tmp;
+	do {
+		swapped = false;
+		for(uint8_t i = 1; i < size; i++){
+			if(donnees[i] > donnees[i-1]){
+				tmp = donnees[i];
+				donnees[i] = donnees[i-1];
+				donnees[i-1] = tmp;
+				swapped = true;
+			}
+		}
+	}
+	while(swapped);
+}
