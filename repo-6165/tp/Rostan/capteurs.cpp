@@ -88,7 +88,7 @@ int main(){
 		arreterJouer();
 	}
 	while(true){
-		wallFollow();
+		ajustementDroite;
 	}
 
 

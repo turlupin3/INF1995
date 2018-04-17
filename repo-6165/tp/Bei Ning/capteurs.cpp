@@ -35,12 +35,18 @@ enum  {
 } volatile etat;
 
 
-const volatile uint8_t vitesseRoueG = 50;
-const volatile uint8_t vitesseRoueD = vitesseRoueG - 13; // roue pas meme vitesse, pour compenser
+const volatile uint8_t vitesseRoueG = 55;
+const volatile uint8_t vitesseRoueD = vitesseRoueG - 11; // roue pas meme vitesse, pour compenser
 volatile uint8_t distanceD = 0;
 volatile uint8_t distanceG = 0;
-volatile uint8_t erreurD = 0;
-volatile uint8_t erreurG = 0;
+volatile const float ECARTENTREMESURES = 0.03264;
+volatile const uint8_t DISTANCEVOULUE = 15;
+volatile int8_t erreurD = 0;
+volatile int8_t erreurG = 0;
+volatile float tauxVariationD = 0;
+volatile float tauxVariationG = 0;
+volatile float integraleD = 0;
+volatile float integraleG = 0;
 volatile uint8_t lectureDonneeD= 0;
 volatile uint8_t lectureDonneeG= 0;
 volatile uint8_t boutonPoussoir = 0;
@@ -63,6 +69,8 @@ void quelCote();
 void determinerObstacle();
 void poteau();
 void wallFollow();
+int8_t pidD(float kp, float ki, float kd);
+int8_t pidG(float kp, float ki, float kd);
 void ajustementDroite();
 void ajustementGauche();
 void faireLeTour();
@@ -72,7 +80,7 @@ void changerPanneau();
 void initialisation();
 bool antiRebond();
 void partirMinuterie();
-
+void calculerDistance();
 void sequence(uint8_t noteI,uint8_t noteII,uint8_t noteIII);
 
 
@@ -105,54 +113,50 @@ int main(){
 	
 	quelCote();
 	allerDroit();
-	
-	//while(true){
-		//~ ajustementDroite();
-		//~ if(etat == faireTour){
-				//~ faireLeTour();
-			//~ }
-	//}
 
 	while (true){
+		
+		determinerEtat();
+		
 		switch (etat){
 			case longerMur:
-				jouerNote(69);
-				wallFollow();
-				delSwitcher(1);
 				transmissionUART('L');
 				transmissionUART(' ');
+				wallFollow();
+				delSwitcher(1);
+				
 				break;
 			
 				
-			case faireTour:
-			
-			///debug Ligne
-				controleMoteurG(0);
-				controleMoteurD(0);
-				delSwitcher(0);
-				allerDroit();
-			///debug Ligne	
-				faireLeTour();
+			//~ case faireTour:
+				//~ //transmissionUART('T');
+				//~ //transmissionUART(' ');
+				//~ controleMoteurG(0);
+				//~ controleMoteurD(0);
+				//~ delSwitcher(0);
+				//~ allerDroit();
+				//~ faireLeTour();
 				
-				transmissionUART('T');
-				transmissionUART(' ');
-				break;
+				
+				//~ break;
 				
 			case changerPan:
-				delSwitcher(2);
-				changerPanneau();
 				transmissionUART('P');
 				transmissionUART(' ');
+				delSwitcher(2);
+				changerPanneau();
+				
 				break;
 				
-			//~ case detectionPoteau:
-				//~ poteau();
-				//~ break;
+			case detectionPoteau:
+				poteau();
+				break;
 			default: 
 				_delay_ms(50);
+				delSwitcher(0);
 				sequence(60,50,40);
-				transmissionUART('D');
-				transmissionUART(' ');
+				//transmissionUART('D');
+				//transmissionUART(' ');
 		};	
 	}
 	return 0; 
@@ -176,128 +180,87 @@ void quelCote(){
 		longerDroite = true;
 		longerGauche = false; 
 	}
-	else {
+	else if (distanceG <= distanceD) {
 		longerDroite = false;
 		longerGauche = true;
 	}
 }
 	
 void wallFollow(){
-	if (longerDroite == true){
+	_delay_ms(200);
+	if (longerDroite){
 		ajustementDroite();
 	}
-	if (longerGauche == true){
+	else if (longerGauche){
 		ajustementGauche();
 	}
 }
 
+int8_t pidD(float kp, float ki, float kd) {
+	
+	int8_t retour = ( (kp * erreurD) + (ki * integraleD) + (kd * tauxVariationD) );
+	if (abs(retour) > 30) {
+		return 80;
+	}
+	else {
+		return abs(retour)+50;
+	}
+}
+int8_t pidG(float kp, float ki, float kd) {
+	
+	int8_t retour = ( (kp * erreurG) + (ki * integraleG) + (kd * tauxVariationG) );
+	if (abs(retour) > 30) {
+		return 80;
+	}
+	else {
+		return abs(retour)+50;
+	}
+}
+
 void ajustementDroite(){
-	// si le robot se dirige vers le panneau on fait tourner la roue droite
-	// plus vite.
+	
 	//delSwitcher(2);	
-	///
-	if (distanceD < 10){
-		controleMoteurD(vitesseRoueD+30);
-		while(distanceD < 10){
-			if(etat == faireTour){
-				faireLeTour();
-			}
-		}
-		allerDroit();
-	}
-	///
+	controleMoteurG(vitesseRoueG);
+	controleMoteurD(vitesseRoueD);
 	
-	else if (distanceD < 15){
-		controleMoteurD(vitesseRoueD+10);
-		while(distanceD < 14){
-			if(etat == faireTour){
-				faireLeTour();
-			}
-		}
-		allerDroit();
+	while(mesuresD[pointeurMesureD] < 14 && etat == longerMur){
+		//delSwitcher(1);
+		controleMoteurD(pidD(1, 0, 0));
 	}
-	
-	// si le robot s'eloigne du panneau on fait tourner la roue gauche
-	// plus vite.
-	if (distanceD > 15 && distanceD < 20){ 
-		controleMoteurG(vitesseRoueG+10);
-		while(distanceD > 16){
-			if(etat == faireTour){
-				faireLeTour();
-			}
+	while(mesuresD[pointeurMesureD] > 16 && etat == longerMur){
+		//delSwitcher(2);
+		controleMoteurG(pidD(1.22, 0, 0));
+		if(mesuresD[pointeurMesureD] > 20){
+			controleMoteurG(100);
 		}
-		allerDroit();
 	}
 
-	else if (distanceD >= 20) {
-		controleMoteurG(vitesseRoueG+10);
-		_delay_ms(250);
-		allerDroit();
-		while(distanceD > 16){
-			if(etat == faireTour){
-				faireLeTour();
-			}
-		}
-		//controleMoteurD(vitesseRoueG+30);
-		//_delay_ms(700);
-		allerDroit();
-	}
+	
+	controleMoteurG(vitesseRoueG);
+	controleMoteurD(vitesseRoueD);
 	//delSwitcher(1);
 }
 
 void ajustementGauche(){
 	
-	// si le robot se dirige vers le panneau on fait tourner la roue gauche
-	// plus vite.
-	//delSwitcher(2);
-	///
-	if (distanceG < 10){
-		controleMoteurG(vitesseRoueG+30);
-		while(distanceG < 10){
-			if(etat == faireTour){
-				faireLeTour();
-			}
-		}
-		allerDroit();
-	}
-	///
+	//delSwitcher(2);	
+	controleMoteurG(vitesseRoueG);
+	controleMoteurD(vitesseRoueD);
 	
-	if (distanceG < 15){
-		controleMoteurG(vitesseRoueG+7);
-		while(distanceG < 14){
-			if(etat == faireTour){
-				faireLeTour();
-			}
+	while(mesuresG[pointeurMesureG] < 14 && etat == longerMur){
+		//delSwitcher(1);
+		controleMoteurG(pidG(1.21, 0, 0));
+	}	
+	while(mesuresG[pointeurMesureG] > 16 && etat == longerMur){
+		//delSwitcher(2);
+		controleMoteurD(pidG(1, 0, 0));
+		if(mesuresG[pointeurMesureG] > 20){
+			controleMoteurD(100);
 		}
-	allerDroit();
 	}
 
-	
-	// si le robot s'eloigne du panneau on fait tourner la roue droite
-	// plus vite.
-	if (distanceG > 15 && distanceG < 20){ 
-		controleMoteurD(vitesseRoueD+10);	
-		while(distanceG > 16){
-			if(etat == faireTour){
-				faireLeTour();
-			}
-		}
-		allerDroit();
-	}
-
-	else if (distanceG >= 20) {
-		controleMoteurD(vitesseRoueD+10);
-		_delay_ms(250);
-		allerDroit();
-		while(distanceG > 16){
-			if(etat == faireTour){
-				faireLeTour();
-			}
-		}
-		//controleMoteurD(vitesseRoueD+30);
-		//_delay_ms(700);
-		allerDroit();
-	}
+	controleMoteurG(vitesseRoueG);
+	controleMoteurD(vitesseRoueD);
 	//delSwitcher(1);
 }
 
@@ -341,10 +304,11 @@ void changerPanneau(){
 		controleMoteurD(vitesseRoueD+20); // 55 ARBITRAIRE
 		_delay_ms(750); // 300 est arbitraire
 		allerDroit();
-		longerDroite = false; // avant ou apres while
-		longerGauche = true;
+		
 		while(distanceG >= 20){
 		}
+		longerDroite = false; // avant ou apres while
+		longerGauche = true;
 		controleMoteurD(vitesseRoueG+30);
 		_delay_ms(700);
 		allerDroit();
@@ -355,11 +319,11 @@ void changerPanneau(){
 		controleMoteurG(vitesseRoueG+20);
 		_delay_ms(750); // 750 est arbitraire
 		allerDroit();
-		longerGauche = false;
-		longerDroite = true;
+		
 		while(distanceD >= 20){
 			}
-		
+		longerGauche = false;
+		longerDroite = true;
 		controleMoteurD(vitesseRoueD+30);
 		_delay_ms(700);
 		allerDroit();
@@ -480,29 +444,29 @@ void determinerEtat(){
 	
 
 	
-	if (longerDroite == true){ // On redonne droit de changer si detecte rien
+	if (longerDroite){ // On redonne droit de changer si detecte rien
 		
-		//jouerNote(69);
+		jouerNote(55);
 
 		if (distanceG > 60) {
 			droitChanger = true;
 		}
 		
-		if(distanceD > 60 && distanceG > 60){
-			etat = faireTour;
-		}
+		//~ if(distanceD > 60 && distanceG > 60){
+			//~ etat = faireTour;
+		//~ }
 	
 		else if (distanceG < 60 && droitChanger == true && estPoteau == false){
 			etat = changerPan;
 		}
 		
-		else if (distanceG < 60 && estPoteau == true){
-			etat = detectionPoteau;
-		}
+		//~ else if (distanceG < 60 && estPoteau == true){
+			//~ etat = detectionPoteau;
+		//~ }
 
-		else if (distanceG < 60){ // des qu'il detecte un obstacle, on doit determiner le type (mur ou poteau)
-			determinerObstacle();
-		}
+		//~ else if (distanceG < 60){ // des qu'il detecte un obstacle, on doit determiner le type (mur ou poteau)
+			//~ determinerObstacle();
+		//~ }
 
 		else {
 			etat = longerMur;
@@ -511,28 +475,28 @@ void determinerEtat(){
 	
 	else if (longerGauche){
 		
-		//jouerNote(75);
+		jouerNote(48);
 
 		
 		if (distanceD > 60) {
 			droitChanger = true;
 		}		
 		
-		if(distanceG > 60 && distanceD > 60){
-			etat = faireTour;
-		}
+		//~ if(distanceG > 60 && distanceD > 60){
+			//~ etat = faireTour;
+		//~ }
 		
 		else if (distanceD < 60 && droitChanger == true && estPoteau == false){
 			etat = changerPan;
 		}
 		
-		else if (distanceD < 60 && estPoteau == true){
-			etat = detectionPoteau;
-		}
+		//~ else if (distanceD < 60 && estPoteau == true){
+			//~ etat = detectionPoteau;
+		//~ }
 		
-		else if (distanceD < 60){
-			determinerObstacle();
-		}
+		//~ else if (distanceD < 60){
+			//~ determinerObstacle();
+		//~ }
 
 		else {
 			etat = longerMur;
@@ -570,10 +534,14 @@ void partirMinuterie () {
 
 ISR ( TIMER2_COMPA_vect  ) { // timer pour capteurD
 	cli();
+
+	mesuresD[pointeurMesureD] = distanceD;
 	lectureDonneeD = lecture8Bit(convertisseurD, 4);
-	distanceD = 2478.633156*(pow(lectureDonneeD,-1.125));
+	calculerDistance();
 	
-	erreurD = abs(distanceD - 15);
+	erreurD = DISTANCEVOULUE - distanceD;
+	tauxVariationD = (float)(erreurD) / ECARTENTREMESURES;
+	integraleD += (float)(DISTANCEVOULUE-distanceD)* ECARTENTREMESURES;
 	
 	if(pointeurMesureD != 120){
 		pointeurMesureD++;
@@ -582,21 +550,20 @@ ISR ( TIMER2_COMPA_vect  ) { // timer pour capteurD
 		pointeurMesureD = 0;
 	}
 	mesuresD[pointeurMesureD] = distanceD;
-	
-	determinerEtat();
 
-	// transmissionUART(0xf6);
-	//transmissionUART('D');
-	 //transmissionUART(distanceD);
+	//transmissionUART(0xf7);
+	//transmissionUART(distanceD);
 	sei();
 }
 
 ISR ( TIMER2_COMPB_vect  ) { // timer pour capteurG
 	cli();
 	lectureDonneeG = lecture8Bit(convertisseurG, 5);
-	distanceG = 2478.633156*(pow(lectureDonneeG,-1.125));
+	calculerDistance();
 	
-	erreurG = abs(distanceG - 15);
+	erreurG = (distanceG - DISTANCEVOULUE);
+	tauxVariationG = (float)(erreurG) / ECARTENTREMESURES;
+	integraleG += (float)(DISTANCEVOULUE-distanceD)* ECARTENTREMESURES;
 	
 	if (pointeurMesureG != 120) {
 		pointeurMesureG++;
@@ -607,11 +574,11 @@ ISR ( TIMER2_COMPB_vect  ) { // timer pour capteurG
 
 	mesuresG[pointeurMesureG] = distanceG;
 	
-	determinerEtat();
 
-	//~ transmissionUART(0xf7);
+	//transmissionUART(0xf6);
 	//transmissionUART('G');
-	// transmissionUART((int)mesuresG[0]);
+	//transmissionUART(distanceG);
+	determinerEtat();
 	sei();
 }
 
@@ -629,6 +596,22 @@ void sequence(uint8_t noteI,uint8_t noteII,uint8_t noteIII) {
 	arreterJouer();
 }
 
-
+void calculerDistance(){
+	distanceG = 2478.633156*(pow(lectureDonneeG,-1.125));
+	if(distanceG > 65){
+		distanceG = 65;
+	}
+	if(distanceG < 10){
+		distanceG = 10;
+	}
+	
+	distanceD = 2478.633156*(pow(lectureDonneeD,-1.125));
+	if(distanceD > 65){
+		distanceD = 65;
+	}
+	if(distanceD < 10){
+		distanceD = 10;
+	}
+}
 
 

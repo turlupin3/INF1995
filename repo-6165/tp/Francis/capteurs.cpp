@@ -52,29 +52,29 @@ int main(){
 int8_t pidD(float kp, float ki, float kd) {
 	
 	int8_t retour = ( (kp * erreurD) + (ki * integraleD) + (kd * tauxVariationD) );
-	if (abs(retour) > 100) {
-		return 100;
+	if (abs(retour) > 30) {
+		return 80;
 	}
 	else {
-		return abs(retour);
+		return abs(retour)+50;
 	}
 }
 
 void wallFollow() {
 
-	controleMoteurG(75);
-	controleMoteurD(55);
+	controleMoteurG(50);
+	controleMoteurD(40);
 	
-	while(mesuresD[pointeurMesureD] < 12){
+	while(mesuresD[pointeurMesureD] < 15){
 		delSwitcher(1);
-		controleMoteurD(pidD(2, 0, 0));
+		controleMoteurD(pidD(1, 0, 0));
 		}
 	while(mesuresD[pointeurMesureD] > 17){
 		delSwitcher(2);
-		controleMoteurG(pidD(2, 0, 0));
+		controleMoteurG(pidD(1, 0, 0));
 	}
-	controleMoteurG(75);
-	controleMoteurD(55);
+	controleMoteurG(50);
+	controleMoteurD(40);
 
 }
 
