@@ -52,7 +52,9 @@ volatile uint8_t lectureDonneeG= 0;
 volatile uint8_t boutonPoussoir = 0;
 volatile uint8_t pointeurMesureD = 0;
 volatile uint8_t pointeurMesureG = 0;
-volatile bool estPoteau = false;
+volatile bool obstacle = false;
+volatile bool poteau = false;
+volatile bool mur = false;
 can convertisseurD = can();
 can convertisseurG = can();
 bool longerDroite;
@@ -62,15 +64,18 @@ uint8_t mesuresD[120];
 uint8_t mesuresG[120];
 uint8_t medianD[7];
 uint8_t medianG[7];
+uint8_t waitTime = 0;
 
 //fonctions
 uint8_t lecture8Bit(can& conv, uint8_t pos);
 void determinerEtat();
 void allerDroit();
 void quelCote();
+void detecterObstacle();
 void determinerObstacle();
-void poteau();
+void changerMur();
 void wallFollow();
+void jouerSonPoteau();
 int8_t pidD(float kp, float ki, float kd);
 int8_t pidG(float kp, float ki, float kd);
 void ajustementDroite();
@@ -78,14 +83,14 @@ void ajustementGauche();
 void faireLeTour();
 void faireLeTourDroite();
 void faireLeTourGauche();
-void changerPanneau();
+
 void initialisation();
 bool antiRebond();
 void partirMinuterie();
 uint8_t calculerDistance(uint8_t donnee);
 void sequence(uint8_t noteI,uint8_t noteII,uint8_t noteIII);
 void sort(uint8_t * donnees, uint8_t size);
-
+uint8_t pastData(uint8_t* donnees, uint8_t ptr, uint8_t byHowMuch);
 
 //~ jouerNote(55);
 //~ _delay_ms(200);
@@ -123,11 +128,9 @@ int main(){
 		
 		switch (etat){
 			case longerMur:
-				//~ transmissionUART('L');
-				//~ transmissionUART(' ');
+				transmissionUART('L');
+				transmissionUART(' ');
 				wallFollow();
-				delSwitcher(1);
-				
 				break;
 			
 				
@@ -144,22 +147,20 @@ int main(){
 				//~ break;
 				
 			case changerPan:
-				//~ transmissionUART('P');
-				//~ transmissionUART(' ');
-				delSwitcher(2);
-				changerPanneau();
-				
+				transmissionUART('M');
+				transmissionUART(' ');
+				changerMur();
 				break;
 				
 			case detectionPoteau:
-				poteau();
+				transmissionUART('P');
+				transmissionUART(' ');	
+				jouerSonPoteau();			
 				break;
+				
 			default: 
-				_delay_ms(50);
-				delSwitcher(0);
-				sequence(60,50,40);
-				//transmissionUART('D');
-				//transmissionUART(' ');
+				transmissionUART('D');
+				transmissionUART(' ');
 		};	
 	}
 	return 0; 
@@ -298,7 +299,56 @@ void faireLeTourGauche(){
 	//delSwitcher(1);
 }
 
-void changerPanneau(){
+void detecterObstacle(){
+	if(longerDroite){
+		if( abs(mesuresG[pointeurMesureG] - pastData(mesuresG, pointeurMesureG, 10)) >= 10){
+			obstacle = true;
+			mur = false;
+			poteau = false;
+		}	
+	}
+	if(longerGauche){
+		if( abs(mesuresD[pointeurMesureD] - pastData(mesuresD, pointeurMesureD, 10)) >= 10){
+			obstacle = true;
+			mur = false;
+			poteau = false;
+		}	
+	}	
+}
+
+void determinerObstacle(){
+	if(longerDroite && obstacle && waitTime > 20){
+		if( abs(mesuresG[pointeurMesureG] - pastData(mesuresG, pointeurMesureG, 15)) >= 10){
+			poteau = true;
+			waitTime = 0;
+		}
+		else {
+			mur = true;
+			poteau = false;
+			waitTime = 0;
+		}
+	}
+	if(longerGauche && obstacle && waitTime > 20){
+		if( abs(mesuresD[pointeurMesureD] - pastData(mesuresD, pointeurMesureD, 15)) >= 10){
+			poteau = true;
+			mur = false;
+			waitTime = 0;
+		}
+		else {
+			mur = true;
+			poteau = false;
+			waitTime = 0;
+		}
+	}
+	
+	else{
+		waitTime++;
+		mur = false;
+		poteau = false;
+	}
+}
+
+void changerMur(){
 	// La roue droite va tourner plus vite pendant quelque temps pour
 	// que le bot s'oriente vers le panneau gauche. Ensuite les roues 
 	// sont a la meme vitesse pour qu'il se dirige droit vers le panneau gauche
@@ -335,44 +385,8 @@ void changerPanneau(){
 	//delSwitcher(1);
 }
 
-void determinerObstacle(){
-	//~ if (longerDroite == true){
-		//~ uint8_t temp = distanceG;
-		//~ _delay_ms(750);
-		//~ if (temp == distanceG + 8 || temp == distanceG - 8){ // avec le timer, la distanceG aura changer
-			//~ estMur = true;
-			//~ estPoteau = false;
-		//~ }
-		//~ else
-	//~ }
-			 
-	
-	//~ if (longerGauche == true{
-		
-	//~ }
-}
-
-void poteau(){
-	arreterMoteur();
-	
-	jouerNote(69);
-	_delay_ms(200);
-	arreterJouer();
-	
-	_delay_ms(100);
-	
-	jouerNote(69);
-	_delay_ms(200);
-	arreterJouer();
-	
-	_delay_ms(100);
-	
-	jouerNote(69);
-	_delay_ms(200);
-	arreterJouer();
-	
-	setUpPWMoteur();
-	allerDroit();
+void jouerSonPoteau(){
+	sequence(69,69,69);
 }
 
 // les trois fonctions suivantes pour l'interrupt
@@ -449,7 +463,7 @@ void determinerEtat(){
 	
 	if (longerDroite){ // On redonne droit de changer si detecte rien
 		
-		//~ jouerNote(55);
+		delSwitcher(1);
 
 		if (distanceG > 60) {
 			droitChanger = true;
@@ -459,17 +473,13 @@ void determinerEtat(){
 			//~ etat = faireTour;
 		//~ }
 	
-		else if (distanceG < 60 && droitChanger == true && estPoteau == false){
+		else if (distanceG < 60 && droitChanger && mur){
 			etat = changerPan;
 		}
 		
-		//~ else if (distanceG < 60 && estPoteau == true){
-			//~ etat = detectionPoteau;
-		//~ }
-
-		//~ else if (distanceG < 60){ // des qu'il detecte un obstacle, on doit determiner le type (mur ou poteau)
-			//~ determinerObstacle();
-		//~ }
+		else if (distanceG < 60 && poteau){
+			etat = detectionPoteau;
+		}
 
 		else {
 			etat = longerMur;
@@ -478,7 +488,7 @@ void determinerEtat(){
 	
 	else if (longerGauche){
 		
-		//~ jouerNote(48);
+		delSwitcher(2);
 
 		
 		if (distanceD > 60) {
@@ -489,17 +499,14 @@ void determinerEtat(){
 			//~ etat = faireTour;
 		//~ }
 		
-		else if (distanceD < 60 && droitChanger == true && estPoteau == false){
+		else if (distanceD < 60 && droitChanger && mur){
 			etat = changerPan;
 		}
 		
-		//~ else if (distanceD < 60 && estPoteau == true){
-			//~ etat = detectionPoteau;
-		//~ }
+		else if (distanceD < 60 && poteau){
+			etat = detectionPoteau;
+		}
 		
-		//~ else if (distanceD < 60){
-			//~ determinerObstacle();
-		//~ }
 
 		else {
 			etat = longerMur;
@@ -557,8 +564,12 @@ ISR ( TIMER2_COMPA_vect  ) { // timer pour capteurD
 	distanceD = medianD[4];
 	mesuresD[pointeurMesureD] = medianD[4];
 
-	transmissionUART(0xf7);
-	transmissionUART(distanceD);
+	detecterObstacle();
+	determinerObstacle();
+
+	//~ transmissionUART(0xf7);
+	//~ transmissionUART(distanceD);
+	
 	sei();
 }
 
@@ -583,9 +594,12 @@ ISR ( TIMER2_COMPB_vect  ) { // timer pour capteurG
 	distanceG = medianG[4];
 	mesuresG[pointeurMesureG] = medianG[4];
 	
+	detecterObstacle();
+	determinerObstacle();
 
-	transmissionUART(0xf6);
-	transmissionUART(distanceG);
+	//~ transmissionUART(0xf6);
+	//~ transmissionUART(distanceG);
+	
 	determinerEtat();
 	sei();
 }
@@ -660,3 +674,14 @@ void sort(uint8_t * donnees, uint8_t size){
 	}
 	while(swapped);
 }
+
+uint8_t pastData(uint8_t* donnees, uint8_t ptr, uint8_t byHowMuch){
+	if( (ptr - byHowMuch) < 0){
+		return donnees[120-abs(ptr - byHowMuch)];
+	}
+	else {
+		return donnees[(ptr - byHowMuch)];
+	}
+}
+
+
