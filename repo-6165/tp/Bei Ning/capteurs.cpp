@@ -318,9 +318,9 @@ void detecterObstacle(){
 }
 
 void determinerObstacle(){
-	
+	cli();
 	if(longerDroite && obstacle && waitTime > 75){
-		if( abs(mesuresG[pointeurMesureG] - pastData(mesuresG, pointeurMesureG, 20)) >= 10){
+		if( abs(mesuresG[pointeurMesureG] - pastData(mesuresG, pointeurMesureG, 70)) >= 10){
 			poteau = true;
 			mur = false;
 		}
@@ -332,7 +332,7 @@ void determinerObstacle(){
 		obstacle = false;
 	}
 	else if(longerGauche && obstacle && waitTime > 75){
-		if( abs(mesuresD[pointeurMesureD] - pastData(mesuresD, pointeurMesureD, 20)) >= 10){
+		if( abs(mesuresD[pointeurMesureD] - pastData(mesuresD, pointeurMesureD, 70)) >= 10){
 			poteau = true;
 			mur = false;
 		}
@@ -350,6 +350,7 @@ void determinerObstacle(){
 		mur = false;
 		poteau = false;
 	}
+	sei();
 }
 
 void changerMur(){
