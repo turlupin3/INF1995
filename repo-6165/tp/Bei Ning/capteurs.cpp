@@ -300,15 +300,16 @@ void faireLeTourGauche(){
 }
 
 void detecterObstacle(){
-	if(longerDroite){
-		if( abs(mesuresG[pointeurMesureG] - pastData(mesuresG, pointeurMesureG, 10)) >= 10){
+	if(longerDroite && !obstacle){
+		if( (pastData(mesuresG, pointeurMesureG, 10) - mesuresG[pointeurMesureG]) >= 10){
 			obstacle = true;
 			mur = false;
 			poteau = false;
 		}	
 	}
-	if(longerGauche){
-		if( abs(mesuresD[pointeurMesureD] - pastData(mesuresD, pointeurMesureD, 10)) >= 10){
+	else if(longerGauche && !obstacle){
+		if( pastData(mesuresD, pointeurMesureD, 10) - abs(mesuresD[pointeurMesureD]) >= 10){
+			delSwitcher(1);
 			obstacle = true;
 			mur = false;
 			poteau = false;
@@ -317,28 +318,31 @@ void detecterObstacle(){
 }
 
 void determinerObstacle(){
-	if(longerDroite && obstacle && waitTime > 20){
-		if( abs(mesuresG[pointeurMesureG] - pastData(mesuresG, pointeurMesureG, 15)) >= 10){
-			poteau = true;
-			waitTime = 0;
-		}
-		else {
-			mur = true;
-			poteau = false;
-			waitTime = 0;
-		}
-	}
-	if(longerGauche && obstacle && waitTime > 20){
-		if( abs(mesuresD[pointeurMesureD] - pastData(mesuresD, pointeurMesureD, 15)) >= 10){
+	
+	if(longerDroite && obstacle && waitTime > 75){
+		if( abs(mesuresG[pointeurMesureG] - pastData(mesuresG, pointeurMesureG, 20)) >= 10){
 			poteau = true;
 			mur = false;
-			waitTime = 0;
 		}
 		else {
 			mur = true;
 			poteau = false;
-			waitTime = 0;
 		}
+		waitTime = 0;
+		obstacle = false;
+	}
+	else if(longerGauche && obstacle && waitTime > 75){
+		if( abs(mesuresD[pointeurMesureD] - pastData(mesuresD, pointeurMesureD, 20)) >= 10){
+			poteau = true;
+			mur = false;
+		}
+		else {
+			mur = true;
+			poteau = false;
+			delSwitcher(2);
+		}
+		waitTime = 0;
+		obstacle = false;
 	}
 	
 	else{
@@ -463,7 +467,7 @@ void determinerEtat(){
 	
 	if (longerDroite){ // On redonne droit de changer si detecte rien
 		
-		delSwitcher(1);
+		//delSwitcher(1);
 
 		if (distanceG > 60) {
 			droitChanger = true;
@@ -488,7 +492,7 @@ void determinerEtat(){
 	
 	else if (longerGauche){
 		
-		delSwitcher(2);
+		//delSwitcher(2);
 
 		
 		if (distanceD > 60) {
@@ -564,8 +568,8 @@ ISR ( TIMER2_COMPA_vect  ) { // timer pour capteurD
 	distanceD = medianD[4];
 	mesuresD[pointeurMesureD] = medianD[4];
 
-	detecterObstacle();
-	determinerObstacle();
+	//~ detecterObstacle();
+	//~ determinerObstacle();
 
 	//~ transmissionUART(0xf7);
 	//~ transmissionUART(distanceD);
@@ -597,8 +601,8 @@ ISR ( TIMER2_COMPB_vect  ) { // timer pour capteurG
 	detecterObstacle();
 	determinerObstacle();
 
-	//~ transmissionUART(0xf6);
-	//~ transmissionUART(distanceG);
+	transmissionUART(0xf6);
+	transmissionUART(distanceG);
 	
 	determinerEtat();
 	sei();
