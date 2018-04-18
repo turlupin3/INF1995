@@ -35,8 +35,8 @@ enum  {
 } volatile etat;
 
 
-const volatile uint8_t vitesseRoueG = 55;
-const volatile uint8_t vitesseRoueD = vitesseRoueG - 11; // roue pas meme vitesse, pour compenser
+const volatile uint8_t vitesseRoueG = 65;
+const volatile uint8_t vitesseRoueD = vitesseRoueG-2; // roue pas meme vitesse, pour compenser
 volatile uint8_t distanceD = 0;
 volatile uint8_t distanceG = 0;
 volatile const float ECARTENTREMESURES = 0.03264;
@@ -203,21 +203,21 @@ void wallFollow(){
 int8_t pidD(float kp, float ki, float kd) {
 	
 	int8_t retour = ( (kp * erreurD) + (ki * integraleD) + (kd * tauxVariationD) );
-	if (abs(retour) > 30) {
-		return 80;
+	if (abs(retour) > 35) {
+		return 100;
 	}
 	else {
-		return abs(retour)+50;
+		return abs(retour)+65;
 	}
 }
 int8_t pidG(float kp, float ki, float kd) {
 	
 	int8_t retour = ( (kp * erreurG) + (ki * integraleG) + (kd * tauxVariationG) );
-	if (abs(retour) > 30) {
-		return 80;
+	if (abs(retour) > 35) {
+		return 100;
 	}
 	else {
-		return abs(retour)+50;
+		return abs(retour)+65;
 	}
 }
 
@@ -227,15 +227,20 @@ void ajustementDroite(){
 	controleMoteurG(vitesseRoueG);
 	controleMoteurD(vitesseRoueD);
 	
-	while(mesuresD[pointeurMesureD] < 14 && etat == longerMur){
+	while(mesuresD[pointeurMesureD] < 15 && etat == longerMur){
 		//delSwitcher(1);
-		controleMoteurD(pidD(1, 0, 0));
+		controleMoteurD(pidD(2, 0.0, 0));
+		if(mesuresD[pointeurMesureD] < 11){
+			//controleMoteurG(100);
+			controleMoteurD(100);
+		}
 	}
 	while(mesuresD[pointeurMesureD] > 16 && etat == longerMur){
 		//delSwitcher(2);
-		controleMoteurG(pidD(1.22, 0, 0));
-		if(mesuresD[pointeurMesureD] > 20){
+		controleMoteurG(pidD(1.5, 0.0, 0));
+		if(mesuresD[pointeurMesureD] > 25){
 			controleMoteurG(100);
+			controleMoteurD(50);
 		}
 	}
 
@@ -251,15 +256,16 @@ void ajustementGauche(){
 	controleMoteurG(vitesseRoueG);
 	controleMoteurD(vitesseRoueD);
 	
-	while(mesuresG[pointeurMesureG] < 14 && etat == longerMur){
+	while(mesuresG[pointeurMesureG] < 15 && etat == longerMur){
 		//delSwitcher(1);
-		controleMoteurG(pidG(1.21, 0, 0));
+		controleMoteurG(pidG(1, 0.01, 0));
 	}	
 	while(mesuresG[pointeurMesureG] > 16 && etat == longerMur){
 		//delSwitcher(2);
-		controleMoteurD(pidG(1, 0, 0));
-		if(mesuresG[pointeurMesureG] > 20){
+		controleMoteurD(pidG(1, 0.01, 0));
+		if(mesuresG[pointeurMesureG] > 25){
 			controleMoteurD(100);
+			controleMoteurG(50);
 		}
 	}
 
@@ -362,7 +368,8 @@ void changerMur(){
 	// sont a la meme vitesse pour qu'il se dirige droit vers le panneau gauche
 	//delSwitcher(2);
 	if (longerDroite == true){
-		controleMoteurD(vitesseRoueD+20); // 55 ARBITRAIRE
+		controleMoteurD(100);
+		//controleMoteurG(55); // 55 ARBITRAIRE
 		_delay_ms(750); // 300 est arbitraire
 		allerDroit();
 		
@@ -370,14 +377,14 @@ void changerMur(){
 		}
 		longerDroite = false; // avant ou apres while
 		longerGauche = true;
-		controleMoteurD(vitesseRoueG+30);
+		controleMoteurD(80);
 		_delay_ms(700);
 		allerDroit();
 	}
 	
 	// meme chose mais avec la roue gauche
 	else if (longerGauche == true){
-		controleMoteurG(vitesseRoueG+20);
+		controleMoteurG(100);
 		_delay_ms(750); // 750 est arbitraire
 		allerDroit();
 		
@@ -437,11 +444,11 @@ ISR(INT0_vect){
 		controleMoteurG(-vitesseRoueG);
 		controleMoteurD(vitesseRoueD);
 		
-		//_delay_ms(2200);
+		_delay_ms(2300);
 		
-		while (tmp + 3 < distanceG){
+		//~ while (tmp + 3 < distanceG){
 		
-		}
+		//~ }
 		allerDroit();
 		longerDroite = false;
 		longerGauche = true;
@@ -452,10 +459,10 @@ ISR(INT0_vect){
 		controleMoteurG(vitesseRoueG);
 		controleMoteurD(-vitesseRoueD);
 		
-		//_delay_ms(2200);
+		_delay_ms(2300);
 		
-		while (tmp + 3 < distanceD){
-		}
+		//~ while (tmp + 3 < distanceD){
+		//~ }
 		
 		allerDroit();
 		longerGauche = false;
