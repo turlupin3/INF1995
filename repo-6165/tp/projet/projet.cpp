@@ -257,7 +257,7 @@ void ajustementDroite(){
 	
 	while(mesuresD[pointeurMesureD] < 15 && etat == longerMur){
 		//delSwitcher(1);
-		controleMoteurD(pidD(2, 0.0, 0));
+		controleMoteurD(pidD(2, 0.1, 0));
 		if(mesuresD[pointeurMesureD] < 11){
 			//controleMoteurG(100);
 			controleMoteurD(100);
@@ -265,7 +265,7 @@ void ajustementDroite(){
 	}
 	while(mesuresD[pointeurMesureD] > 16 && etat == longerMur){
 		//delSwitcher(2);
-		controleMoteurG(pidD(1.5, 0.0, 0));
+		controleMoteurG(pidD(1.5, 0.1, 0));
 		if(mesuresD[pointeurMesureD] > 25){
 			controleMoteurG(100);
 			controleMoteurD(50);
@@ -286,11 +286,11 @@ void ajustementGauche(){
 	
 	while(mesuresG[pointeurMesureG] < 15 && etat == longerMur){
 		//delSwitcher(1);
-		controleMoteurG(pidG(1, 0.01, 0));
+		controleMoteurG(pidG(2, 0.01, 0));
 	}	
 	while(mesuresG[pointeurMesureG] > 16 && etat == longerMur){
 		//delSwitcher(2);
-		controleMoteurD(pidG(1, 0.01, 0));
+		controleMoteurD(pidG(1.5, 0.01, 0));
 		if(mesuresG[pointeurMesureG] > 25){
 			controleMoteurD(100);
 			controleMoteurG(50);

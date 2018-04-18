@@ -131,7 +131,7 @@ OBJDEPS=$(CFILES:.c=.o) \
 all: $(TRG)
 
 # Implementation de la cible
-$(TRG): $(OBJDEPS)
+$(TRG): $(OBJDEPS) library
 	$(CC) $(LDFLAGS) -o $(TRG) $(OBJDEPS) \
 	-lm $(LIBS)
 

@@ -23,13 +23,13 @@ MCU=atmega324pa
 
 # Nom de votre projet
 # (utilisez un seul mot, exemple: 'monprojet')
-PROJECTNAME=tp10
+PROJECTNAME=projet
 
 # Fichiers sources
 # Utilisez le suffixe .cpp pour les fichiers C++
 # Listez tous les fichiers a compiler, separes par
 # un espace. exemple: 'tp1.c tp2.cpp':
-PRJSRC=capteurs.cpp
+PRJSRC=projet.cpp
 
 # Inclusions additionnels (ex: -I/path/to/mydir)
 INC= -I library
@@ -131,7 +131,7 @@ OBJDEPS=$(CFILES:.c=.o) \
 all: $(TRG)
 
 # Implementation de la cible
-$(TRG): $(OBJDEPS)
+$(TRG): $(OBJDEPS) library/library.a
 	$(CC) $(LDFLAGS) -o $(TRG) $(OBJDEPS) \
 	-lm $(LIBS)
 
