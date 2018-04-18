@@ -318,42 +318,104 @@ void detecterObstacle(){
 }
 
 void determinerObstacle(){
-	cli();
-	if(longerDroite && obstacle && waitTime > 30){
-		if( abs(mesuresG[pointeurMesureG] - pastData(mesuresG, pointeurMesureG, 25)) >= 10){
+	
+		cli();
+	
+	uint8_t TEMP_ATTENDRE = 30; 		// originale is 75
+	uint8_t TEMP_PASSER = 29;		// originale is 70
+	uint8_t DISTANCE_DELTA = 10; 	// original is 10
+	
+	if(longerDroite && obstacle && (waitTime > TEMP_ATTENDRE)){
+		
+			//~ transmissionUART(20);
+			//~ transmissionUART(mesuresG[pointeurMesureG]);
+			//~ transmissionUART(pastData(mesuresG, pointeurMesureG, 70));
+			//~ transmissionUART(0);
+		
+		
+		//if( abs(mesuresG[pointeurMesureG] - pastData(mesuresG, pointeurMesureG, 70)) >= 10){
+		if( abs(mesuresG[pointeurMesureG] - pastData(mesuresG, pointeurMesureG, TEMP_PASSER)) >= DISTANCE_DELTA && waitTime >= TEMP_ATTENDRE){
 			poteau = true;
 			mur = false;
-			jouerSonPoteau();
+			sequence(69,69,69);
+			waitTime = 0;
 		}
-		else {
-			mur = true;
-			poteau = false;
-		}
-		waitTime = 0;
-		obstacle = false;
-	}
-	else if(longerGauche && obstacle && waitTime > 30){
-		if( abs(mesuresD[pointeurMesureD] - pastData(mesuresD, pointeurMesureD, 25)) >= 10){
-			poteau = true;
-			mur = false;
-			jouerSonPoteau();
-			
-		}
-		else {
+		else if (waitTime >= TEMP_ATTENDRE) {
+			//sequence(50,60,70);
 			mur = true;
 			poteau = false;
 			delSwitcher(2);
+			waitTime = 0;
 		}
-		waitTime = 0;
+		
+		obstacle = false;
+	}
+	else if(longerGauche && obstacle && (waitTime > TEMP_ATTENDRE)){
+		//if( abs(mesuresD[pointeurMesureD] - pastData(mesuresD, pointeurMesureD, 70)) >= 10){
+		if(abs(mesuresD[pointeurMesureD]) - pastData(mesuresD, pointeurMesureD, TEMP_PASSER) >= DISTANCE_DELTA && waitTime >= TEMP_ATTENDRE){
+			poteau = true;
+			mur = false;
+			waitTime = 0;
+			sequence(69,69,69);
+			//~ transmissionUART(0110);
+			//~ transmissionUART(0110);
+			//~ transmissionUART(0110);
+		}
+		else if (waitTime >= TEMP_ATTENDRE){
+			//sequence(50,60,70);
+			mur = true;
+			poteau = false;
+			delSwitcher(2);
+			waitTime = 0;
+		}
+		
 		obstacle = false;
 	}
 	
-	else{
+	else {
 		waitTime++;
 		mur = false;
 		poteau = false;
 	}
 	sei();
+	
+	
+	
+	//~ cli();
+	//~ if(longerDroite && obstacle && waitTime > 30){
+		//~ if( abs(mesuresG[pointeurMesureG] - pastData(mesuresG, pointeurMesureG, 25)) >= 10 && waitTime > 30){
+			//~ poteau = true;
+			//~ mur = false;
+			//~ waitTime = 0;
+		//~ }
+		//~ else if(waitTime > 30) {
+			//~ mur = true;
+			//~ poteau = false;
+			//~ waitTime = 0;
+		//~ }
+		//~ obstacle = false;
+	//~ }
+	//~ else if(longerGauche && obstacle && waitTime > 30){
+		//~ if( abs(mesuresD[pointeurMesureD] - pastData(mesuresD, pointeurMesureD, 25)) >= 10 && waitTime > 30){
+			//~ poteau = true;
+			//~ mur = false;
+			//~ waitTime = 0;
+		//~ }
+		//~ else if (waitTime > 30) {
+			//~ mur = true;
+			//~ poteau = false;
+			//~ delSwitcher(2);
+			//~ waitTime = 0;
+		//~ }
+		//~ obstacle = false;
+	//~ }
+	
+	//~ else{
+		//~ waitTime++;
+		//~ mur = false;
+		//~ poteau = false;
+	//~ }
+	//~ sei();
 }
 
 void changerMur(){
@@ -485,9 +547,9 @@ void determinerEtat(){
 			etat = changerPan;
 		}
 		
-		//~ else if (distanceG < 60 && poteau){
-			//~ etat = detectionPoteau;
-		//~ }
+		else if (distanceG < 60 && poteau){
+			etat = detectionPoteau;
+		}
 
 		else {
 			etat = longerMur;
@@ -511,9 +573,9 @@ void determinerEtat(){
 			etat = changerPan;
 		}
 		
-		//~ else if (distanceD < 60 && poteau){
-			//~ etat = detectionPoteau;
-		//~ }
+		else if (distanceD < 60 && poteau){
+			etat = detectionPoteau;
+		}
 		
 
 		else {
