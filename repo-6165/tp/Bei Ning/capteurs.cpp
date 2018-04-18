@@ -124,7 +124,7 @@ int main(){
 
 	while (true){
 		
-		determinerEtat();
+		//determinerEtat();
 		
 		switch (etat){
 			case longerMur:
@@ -319,10 +319,11 @@ void detecterObstacle(){
 
 void determinerObstacle(){
 	cli();
-	if(longerDroite && obstacle && waitTime > 75){
-		if( abs(mesuresG[pointeurMesureG] - pastData(mesuresG, pointeurMesureG, 70)) >= 10){
+	if(longerDroite && obstacle && waitTime > 30){
+		if( abs(mesuresG[pointeurMesureG] - pastData(mesuresG, pointeurMesureG, 25)) >= 10){
 			poteau = true;
 			mur = false;
+			jouerSonPoteau();
 		}
 		else {
 			mur = true;
@@ -331,10 +332,12 @@ void determinerObstacle(){
 		waitTime = 0;
 		obstacle = false;
 	}
-	else if(longerGauche && obstacle && waitTime > 75){
-		if( abs(mesuresD[pointeurMesureD] - pastData(mesuresD, pointeurMesureD, 70)) >= 10){
+	else if(longerGauche && obstacle && waitTime > 30){
+		if( abs(mesuresD[pointeurMesureD] - pastData(mesuresD, pointeurMesureD, 25)) >= 10){
 			poteau = true;
 			mur = false;
+			jouerSonPoteau();
+			
 		}
 		else {
 			mur = true;
@@ -482,9 +485,9 @@ void determinerEtat(){
 			etat = changerPan;
 		}
 		
-		else if (distanceG < 60 && poteau){
-			etat = detectionPoteau;
-		}
+		//~ else if (distanceG < 60 && poteau){
+			//~ etat = detectionPoteau;
+		//~ }
 
 		else {
 			etat = longerMur;
@@ -508,9 +511,9 @@ void determinerEtat(){
 			etat = changerPan;
 		}
 		
-		else if (distanceD < 60 && poteau){
-			etat = detectionPoteau;
-		}
+		//~ else if (distanceD < 60 && poteau){
+			//~ etat = detectionPoteau;
+		//~ }
 		
 
 		else {
