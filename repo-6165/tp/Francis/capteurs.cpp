@@ -49,7 +49,6 @@ volatile float integraleD = 0;
 volatile float integraleG = 0;
 volatile uint8_t lectureDonneeD= 0;
 volatile uint8_t lectureDonneeG= 0;
-volatile uint8_t boutonPoussoir = 0;
 volatile uint8_t pointeurMesureD = 0;
 volatile uint8_t pointeurMesureG = 0;
 volatile bool obstacle = false;
@@ -65,6 +64,10 @@ uint8_t mesuresG[120];
 uint8_t medianD[7];
 uint8_t medianG[7];
 uint8_t waitTime = 0;
+
+volatile uint8_t boutonPoussoir = 0x01;
+volatile bool boole = 0x01;
+
 
 //fonctions
 uint8_t lecture8Bit(can& conv, uint8_t pos);
@@ -83,7 +86,6 @@ void ajustementGauche();
 void faireLeTour();
 void faireLeTourDroite();
 void faireLeTourGauche();
-
 void initialisation();
 bool antiRebond();
 void partirMinuterie();
@@ -92,13 +94,42 @@ void sequence(uint8_t noteI,uint8_t noteII,uint8_t noteIII);
 void sort(uint8_t * donnees, uint8_t size);
 uint8_t pastData(uint8_t* donnees, uint8_t ptr, uint8_t byHowMuch);
 
-//~ jouerNote(55);
-//~ _delay_ms(200);
-//~ arreterJouer();
+void envoieInfo(Memoire24CXXX &memoire);
+void ecrireInfo(Memoire24CXXX &memoire);
+void initialisationInt();
+uint8_t getBouton();
 
-//~ delSwitcher(1); // 1 = vert/// 2 = rouge /// 0 = off
-int main(){	
+volatile bool diagnostic;
+uint8_t reset;
+Memoire24CXXX memoire = Memoire24CXXX();
+
+void parcours();
+void diag();
+
+
+int main(){
 	
+	memoire.lecture(100, &reset);
+	reset = !reset;
+	memoire.ecriture(100, reset);
+	
+	
+	//~ parcours();
+	if(reset){
+		diagnostic = true;
+		diag();
+	}
+	else {
+		diagnostic = false;
+		parcours();
+	}
+	return 0;
+}
+
+
+
+void parcours(){	
+	diagnostic = false;
 	initialisationUART();
 	initialisation();
 	setUpPWMoteur();
@@ -162,11 +193,8 @@ int main(){
 				transmissionUART('D');
 				transmissionUART(' ');
 		};	
-	}
-	return 0; 
+	} 
 }
-
-
 
 // fait le decalage de deux bit CAN car 2 des 10 bits sont inutilises
 uint8_t lecture8Bit(can& conv, uint8_t pos){
@@ -223,7 +251,7 @@ int8_t pidG(float kp, float ki, float kd) {
 
 void ajustementDroite(){
 	
-	//delSwitcher(2);	
+	delSwitcher(2);	
 	controleMoteurG(vitesseRoueG);
 	controleMoteurD(vitesseRoueD);
 	
@@ -247,12 +275,12 @@ void ajustementDroite(){
 	
 	controleMoteurG(vitesseRoueG);
 	controleMoteurD(vitesseRoueD);
-	//delSwitcher(1);
+	delSwitcher(1);
 }
 
 void ajustementGauche(){
 	
-	//delSwitcher(2);	
+	delSwitcher(2);	
 	controleMoteurG(vitesseRoueG);
 	controleMoteurD(vitesseRoueD);
 	
@@ -271,38 +299,7 @@ void ajustementGauche(){
 
 	controleMoteurG(vitesseRoueG);
 	controleMoteurD(vitesseRoueD);
-	//delSwitcher(1);
-}
-
-void faireLeTour(){
-	if (longerDroite == true){
-		faireLeTourDroite();
-	}
-	if (longerGauche == true){
-		faireLeTourGauche();
-	}
-}
-
-void faireLeTourDroite(){
-	// un roue tourne plus vite et l'autre moins vite pour contourner le panneau
-	// jusqu'a temps que le capteur capte 15cm
-	//delSwitcher(2);
-	controleMoteurG(vitesseRoueG+25);
-	controleMoteurD(vitesseRoueD);
-	while (distanceD >= 15){
-	}	 
-	allerDroit();
-	//delSwitcher(1);
-}
-
-void faireLeTourGauche(){
-	//delSwitcher(2);
-	controleMoteurD(vitesseRoueD+25);
-	controleMoteurG(vitesseRoueG);
-	while (distanceG >= 15){
-	}	 
-	allerDroit();
-	//delSwitcher(1);
+	delSwitcher(1);
 }
 
 void detecterObstacle(){
@@ -316,7 +313,6 @@ void detecterObstacle(){
 	}
 	else if(longerGauche && !obstacle){
 		if( pastData(mesuresD, pointeurMesureD, 20) - abs(mesuresD[pointeurMesureD]) >= 10){
-			delSwitcher(1);
 			obstacle = true;
 			mur = false;
 			poteau = false;
@@ -343,12 +339,10 @@ void determinerObstacle(){
 		if( abs(mesuresD[pointeurMesureD] - pastData(mesuresD, pointeurMesureD, 35)) >= 10){
 			poteau = true;
 			mur = false;
-			delSwitcher(0);
 		}
 		else {
 			mur = true;
 			poteau = false;
-			delSwitcher(2);
 		}
 		waitTime = 0;
 		obstacle = false;
@@ -366,7 +360,7 @@ void changerMur(){
 	// La roue droite va tourner plus vite pendant quelque temps pour
 	// que le bot s'oriente vers le panneau gauche. Ensuite les roues 
 	// sont a la meme vitesse pour qu'il se dirige droit vers le panneau gauche
-	//delSwitcher(2);
+	delSwitcher(2);
 	if (longerDroite == true){
 		controleMoteurD(100);
 		//controleMoteurG(55); // 55 ARBITRAIRE
@@ -397,7 +391,7 @@ void changerMur(){
 		allerDroit();
 	}
 	droitChanger = false;
-	//delSwitcher(1);
+	delSwitcher(1);
 }
 
 void jouerSonPoteau(){
@@ -428,48 +422,6 @@ void initialisation(){
 	EIMSK |= (1 << INT0);
 	EICRA |= (1 << ISC01) | (0 << ISC00); // sensible falling edge
 
-	sei();
-}
-
-ISR(INT0_vect){
-	cli();
-	
-	if(antiRebond()){
-		boutonPoussoir = 1;
-	}
-	//delSwitcher(2);
-	if(longerDroite){
-		
-		uint8_t tmp = distanceD;
-		controleMoteurG(-vitesseRoueG);
-		controleMoteurD(vitesseRoueD);
-		
-		_delay_ms(2300);
-		
-		//~ while (tmp + 3 < distanceG){
-		
-		//~ }
-		allerDroit();
-		longerDroite = false;
-		longerGauche = true;
-	}
-	else if(longerGauche){
-		
-		uint8_t tmp = distanceG;
-		controleMoteurG(vitesseRoueG);
-		controleMoteurD(-vitesseRoueD);
-		
-		_delay_ms(2300);
-		
-		//~ while (tmp + 3 < distanceD){
-		//~ }
-		
-		allerDroit();
-		longerGauche = false;
-		longerDroite = true;
-	}
-	//delSwitcher(1);
-	EIFR |= (1 << INTF0);
 	sei();
 }
 
@@ -558,68 +510,6 @@ void partirMinuterie () {
 
 }
 
-ISR ( TIMER2_COMPA_vect  ) { // timer pour capteurD
-	cli();
-
-	mesuresD[pointeurMesureD] = distanceD;
-	lectureDonneeD = lecture8Bit(convertisseurD, 4);
-	distanceD = calculerDistance(lectureDonneeD);
-	
-	erreurD = DISTANCEVOULUE - distanceD;
-	tauxVariationD = (float)(erreurD) / ECARTENTREMESURES;
-	integraleD += (float)(DISTANCEVOULUE-distanceD)* ECARTENTREMESURES;
-	
-	if(pointeurMesureD != 120){
-		pointeurMesureD++;
-	}
-	else {
-		pointeurMesureD = 0;
-	}
-	medianD[pointeurMesureD % 7] = distanceD;
-	sort(medianD, 7);
-	distanceD = medianD[4];
-	mesuresD[pointeurMesureD] = medianD[4];
-
-	//~ detecterObstacle();
-	//~ determinerObstacle();
-
-	//~ transmissionUART(0xf7);
-	//~ transmissionUART(distanceD);
-	
-	sei();
-}
-
-ISR ( TIMER2_COMPB_vect  ) { // timer pour capteurG
-	cli();
-	lectureDonneeG = lecture8Bit(convertisseurG, 5);
-	distanceG = calculerDistance(lectureDonneeG);
-	
-	erreurG = (distanceG - DISTANCEVOULUE);
-	tauxVariationG = (float)(erreurG) / ECARTENTREMESURES;
-	integraleG += (float)(DISTANCEVOULUE-distanceD)* ECARTENTREMESURES;
-	
-	if (pointeurMesureG != 120) {
-		pointeurMesureG++;
-	}
-	else {
-		pointeurMesureG = 0;
-	}
-
-	medianG[pointeurMesureG % 7] = distanceG;
-	sort(medianG, 7);
-	distanceG = medianG[4];
-	mesuresG[pointeurMesureG] = medianG[4];
-	
-	detecterObstacle();
-	determinerObstacle();
-
-	//~ transmissionUART(0xf6);
-	//~ transmissionUART(distanceG);
-	
-	determinerEtat();
-	sei();
-}
-
 void sequence(uint8_t noteI,uint8_t noteII,uint8_t noteIII) {
 	jouerNote(noteI);
 	_delay_ms(150);
@@ -651,7 +541,7 @@ uint8_t calculerDistance(uint8_t donnee){
 		//~ distanceD = 10;
 	//~ }
 	
-		if (donnee > 132) {
+	if (donnee > 132) {
 		return 10;
 	}
 	else if (donnee > 91) {
@@ -670,7 +560,7 @@ uint8_t calculerDistance(uint8_t donnee){
 		return (uint8_t)(-2 * (float)(donnee)+114);
 	}
 	else {
-		return 75;
+		return 85;
 	}
 }
 
@@ -698,6 +588,222 @@ uint8_t pastData(uint8_t* donnees, uint8_t ptr, uint8_t byHowMuch){
 	else {
 		return donnees[(ptr - byHowMuch)];
 	}
+}
+
+
+
+void diag(){
+	diagnostic = true;
+	DDRD = 0xf0;
+	//demarrage();
+
+	initialisationUART();
+	initialisationInt();	
+	setUpPWMoteur();
+	jouerNote(55);	
+	_delay_ms(200);
+	arreterJouer();
+
+	
+	//ecrireInfo(memoire);
+	_delay_ms(10);
+	envoieInfo(memoire);
+	partirMinuterie(); ///MAKE A SECONDE UART ELSE INT BUTTON IS NOT CLEAN///	
+	struct operation{
+		unsigned char instruction; 
+		int8_t operande;
+		};
+		
+	operation op;	 
+for(;;){ 
+		op.instruction= receptionUART();
+		op.operande = receptionUART();
+		
+		switch (op.instruction) {
+			case 0xf8: //vitesse de roue gauche
+
+				controleMoteurG(op.operande);
+
+				break;
+			case 0xf9: //vitesse de rouge droite
+
+				controleMoteurD(op.operande);
+
+				break;
+			case 0xfa: // couleur de la del libre
+				
+				delSwitcher(op.operande);
+
+				break;
+			case 0xfb: // requete denvoi des information didentification
+				envoieInfo(memoire);
+				break;
+			default:
+				//error
+				break;
+		}
+	}
+}
+	
+void envoieInfo(Memoire24CXXX &memoire) {
+	cli();
+		uint8_t bit;
+		for (int i = 0; i < 33; i++){
+			memoire.lecture(i, &bit);
+			transmissionUART(bit);
+		}
+		sei();
+	}
+
+void ecrireInfo(Memoire24CXXX &memoire){
+	
+		uint8_t addresseNomRobot = 0xf0;
+		uint8_t addresseNumeroEquipe = 0xf1;
+		uint8_t addresseNumeroSection = 0xf2;
+		uint8_t addresseSession = 0xf3;
+		uint8_t addresseCouleur = 0xf4;
+		
+		uint8_t nomRobot[13] = "JRomBot";
+		uint8_t numeroEquipe[9] = "6165";
+		uint8_t numeroSection = 3;
+		uint8_t session[4] = {'1','8','-','1'};
+		uint8_t couleur = 1;
+		
+		memoire.ecriture(0, addresseNomRobot);
+		memoire.ecriture(1, nomRobot, 13);
+		memoire.ecriture(14, addresseNumeroEquipe);
+		memoire.ecriture(15, numeroEquipe, 9);
+		memoire.ecriture(24, addresseNumeroSection);
+		memoire.ecriture(25, numeroSection);
+		memoire.ecriture(26, addresseSession);
+		memoire.ecriture(27, session, 4);
+		memoire.ecriture(31, addresseCouleur);
+		memoire.ecriture(32, couleur);
+		
+	}
+
+void initialisationInt(){
+	cli();
+	//DDRA = 0xff;
+	//DDRD = 0x00;
+	EIMSK |= (1 << INT0);
+	EICRA |= (1 << ISC00); // set external interupt on pin INT0 with option any logical change generate an interupt request
+	
+	sei();
+}
+
+
+
+ISR(INT0_vect){
+	cli();
+	
+	if(antiRebond()){
+		boutonPoussoir = 1;
+	}
+	
+	if(diagnostic){
+		_delay_ms(25);
+		boole = !boole;
+		transmissionUART(0xf5);
+		transmissionUART(boole);
+	}
+	else {
+		delSwitcher(2);
+		if(longerDroite){
+
+			controleMoteurG(-vitesseRoueG);
+			controleMoteurD(vitesseRoueD);
+			
+			_delay_ms(2000);
+			
+			//~ while (tmp + 3 < distanceG){
+			
+			//~ }
+			allerDroit();
+			//~ longerDroite = false;
+			//~ longerGauche = true;
+			quelCote();
+		}
+		else if(longerGauche){
+			
+			controleMoteurG(vitesseRoueG);
+			controleMoteurD(-vitesseRoueD);
+			
+			_delay_ms(2000);
+			
+			//~ while (tmp + 3 < distanceD){
+			//~ }
+			
+			allerDroit();
+			longerGauche = false;
+			longerDroite = true;
+		}
+		delSwitcher(1);
+	}
+	EIFR |= (1 << INTF0);
+	sei();
+}
+
+ISR ( TIMER2_COMPA_vect  ) { // timer pour capteurD
+	cli();
+	
+	mesuresD[pointeurMesureD] = distanceD;
+	lectureDonneeD = lecture8Bit(convertisseurD, 4);
+	distanceD = calculerDistance(lectureDonneeD);
+	
+	erreurD = DISTANCEVOULUE - distanceD;
+	tauxVariationD = (float)(erreurD) / ECARTENTREMESURES;
+	integraleD += (float)(DISTANCEVOULUE-distanceD)* ECARTENTREMESURES;
+	
+	if(pointeurMesureD != 120){
+		pointeurMesureD++;
+	}
+	else {
+		pointeurMesureD = 0;
+	}
+	medianD[pointeurMesureD % 7] = distanceD;
+	sort(medianD, 7);
+	distanceD = medianD[4];
+	mesuresD[pointeurMesureD] = medianD[4];
+
+	//~ detecterObstacle();
+	//~ determinerObstacle();
+
+	transmissionUART(0xf7);
+	transmissionUART(distanceD);
+	
+	sei();
+}
+
+ISR ( TIMER2_COMPB_vect  ) { // timer pour capteurG
+	cli();
+	lectureDonneeG = lecture8Bit(convertisseurG, 5);
+	distanceG = calculerDistance(lectureDonneeG);
+	
+	erreurG = (distanceG - DISTANCEVOULUE);
+	tauxVariationG = (float)(erreurG) / ECARTENTREMESURES;
+	integraleG += (float)(DISTANCEVOULUE-distanceD)* ECARTENTREMESURES;
+	
+	if (pointeurMesureG != 120) {
+		pointeurMesureG++;
+	}
+	else {
+		pointeurMesureG = 0;
+	}
+
+	medianG[pointeurMesureG % 7] = distanceG;
+	sort(medianG, 7);
+	distanceG = medianG[4];
+	mesuresG[pointeurMesureG] = medianG[4];
+	if(!diagnostic){
+		detecterObstacle();
+		determinerObstacle();
+	}
+	transmissionUART(0xf6);
+	transmissionUART(distanceG);
+	
+	determinerEtat();
+	sei();
 }
 
 
