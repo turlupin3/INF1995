@@ -735,8 +735,9 @@ ISR(INT0_vect){
 			//~ }
 			
 			allerDroit();
-			longerGauche = false;
-			longerDroite = true;
+			//~ longerGauche = false;
+			//~ longerDroite = true;
+			quelCote();
 		}
 		delSwitcher(1);
 	}
